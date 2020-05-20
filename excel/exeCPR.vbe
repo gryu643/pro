@@ -1,0 +1,38 @@
+Option Explicit
+
+Call exe
+
+Sub exe()
+    'declare
+    Dim app
+    Dim Path
+    Dim strFile
+
+    'init
+    'Excelアプリケーションオブジェクト作成
+    Set app = WScript.CreateObject("Excel.Application")
+    strFile = "CPR.xlsm"
+
+    'implement
+    '現在のフォルダのパスを取得
+    Set Path = CreateObject("Scripting.FileSystemObject").GetFolder(".")
+
+    'Excelの可視化
+    app.Visible = False
+
+    'Excelオブジェクトのアクティベート
+    CreateObject("WScript.Shell").AppActivate app.Caption
+
+    'ワークブックを開く
+    app.Workbooks.Open Path & "\" & strFile
+
+    'VBA関数の実行
+    app.Application.Run "Complete_Plant_Record"
+
+    'ワークブックを閉じる
+    app.Workbooks(strFile).Close
+
+    'オブジェクトの解放
+    set app = Nothing
+
+End Sub

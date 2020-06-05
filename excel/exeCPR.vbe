@@ -7,11 +7,15 @@ Sub exe()
     Dim app
     Dim Path
     Dim strFile
+    Dim shell
 
     'init
     'Excelアプリケーションオブジェクト作成
     Set app = WScript.CreateObject("Excel.Application")
     strFile = "CPR.xlsm"
+
+    'ウィンドウサイズを操作するためのオブジェクト作成
+    Set shell = WScript.CreateObject("Shell.Application")
 
     'implement
     '現在のフォルダのパスを取得
@@ -19,6 +23,9 @@ Sub exe()
 
     'Excelの可視化
     app.Visible = False
+
+    '全ウィンドウ最小化
+    shell.MinimizeAll
 
     'Excelオブジェクトのアクティベート
     CreateObject("WScript.Shell").AppActivate app.Caption
@@ -32,7 +39,11 @@ Sub exe()
     'ワークブックを閉じる
     app.Workbooks(strFile).Close
 
+    '全ウィンドウサイズを元に戻す
+    shell.UndoMinimizeAll
+
     'オブジェクトの解放
-    set app = Nothing
+    Set app = Nothing
+    Set shell = Nothing
 
 End Sub

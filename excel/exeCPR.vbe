@@ -45,5 +45,5 @@ Sub exe()
     'オブジェクトの解放
     Set app = Nothing
     Set shell = Nothing
-
+    Set Path = Nothing
 End Sub

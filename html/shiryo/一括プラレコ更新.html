@@ -1,0 +1,132 @@
+<html lang="ja"><head>
+<meta charset="utf-8">
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+
+<title>N-Orion　一括プラレコ更新</title>
+<link rel="stylesheet" href="/orion/resources/vendor/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/orion/resources/vendor/bootstrap-combobox/css/bootstrap-combobox.css">
+<link rel="stylesheet" href="/orion/resources/vendor/bootstrap-datepicker/css/bootstrap-datepicker.min.css">
+<link rel="stylesheet" href="/orion/resources/vendor/slickgrid/slick.grid.css">
+<link rel="stylesheet" href="/orion/resources/vendor/slickgrid/examples/examples.css">
+<link rel="stylesheet" href="/orion/resources/css/commons/main.css">
+<link rel="stylesheet" href="/orion/resources/css/page-specifics/i02/i0201z.css">
+<script type="text/javascript">
+  ORION_CONTEXT_PATH = "/orion";
+  orion = {};
+</script>
+
+<style type="text/css" rel="stylesheet"></style></head><body class="col-xs-12">
+
+
+  <div id="I0201A-00-E0045" class="hide">{0}の取得に失敗しました。</div>
+
+
+
+
+  <div class="form-group col-xs-12">
+    <div class="row">
+      <div class="control-label text-muted label-title">検索条件</div>
+    </div>
+  </div>
+
+  <form id="search-form" method="post" action="/orion/i0201z">
+    <!--検索条件設定-->
+    <input id="hidden-kojiNo" value="" type="hidden">
+    <input id="hidden-kobetsuKojiId" value="" type="hidden">
+    <div class="form-group ">
+      <div class="form-group col-xs-12  input-area">
+        <div class="row">
+          <div class="col-xs-2 control-label bg-primary">エリア名</div>
+          <div class="col-xs-10">
+            <div class="combobox-container"> <input name="areaCode" value="" type="hidden"> <div class="input-group"> <input class="combobox input-large form-control" type="text" autocomplete="off" placeholder=""> <span class="input-group-addon dropdown-toggle" data-dropdown="dropdown"> <span class="caret"></span> <span class="glyphicon glyphicon-remove"></span> </span> </div> </div><select style="display: none;" id="area-combobox" class="combobox input-large form-control"><option
+value=""></option><option value="25">滋賀</option><option value="26">京都</option><option value="27">大阪</option><option value="28">兵庫</option><option value="29">奈良</option><option value="30">和歌山</option></select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-2 control-label bg-primary">工事計画番号</div>
+          <div class="col-xs-10">
+            <div class="combobox-container"> <input name="kojiNo" value="" type="hidden"> <div class="input-group"> <input class="combobox input-large form-control" type="text" autocomplete="off"> <span class="input-group-addon dropdown-toggle" data-dropdown="dropdown"> <span class="caret"></span> <span class="glyphicon glyphicon-remove"></span> </span> </div> </div><select style="display: none;" id="kojino-combobox" class="combobox input-large form-control"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="form-group col-xs-12 text-center">
+      <button id="search-button" class="btn btn-color " type="button">検索</button>
+    </div>
+  <div>
+<input name="_csrf" value="34054fdd-768a-463e-b6be-a2100e679497" type="hidden">
+</div></form>
+
+  <!-- 検索結果 個別工事一覧-->
+  <div class="form-group col-xs-12">
+    <div class="row">
+      <div class="control-label text-muted label-title">検索結果</div>
+    </div>
+  </div>
+  <div class="form-group col-xs-12 ">
+    <div class="row">
+      <label class="control-label col-xs-12 bg-primary grid-title ">個別工事一覧</label>
+      <div style="outline: 0px; overflow: hidden; position: relative;" id="kobetsulist-grid" class="grid grid-height  slickgrid_991103 ui-widget"><div hideFocus="" style="outline: 0px; left: 0px; top: 0px; width: 0px; height: 0px; position: fixed;" tabIndex="0"></div><div style="overflow: hidden; position: relative;" class="slick-header ui-state-default"><div style="left: -1000px; width: 2652px;" class="slick-header-columns" unselectable="on"><div style="width: 231px;"
+id="slickgrid_991103kojiNo" class="ui-state-default slick-header-column slick-header-sortable" title=""><span class="slick-column-name">工事計画番号</span><span class="slick-sort-indicator"></span><div class="slick-resizable-handle"></div></div><div style="width: 191px;" id="slickgrid_991103kobetsuKojiKanriNo" class="ui-state-default slick-header-column slick-header-sortable" title=""><span class="slick-column-name">管理番号</span><span class="slick-sort-indicator"></span><div
+class="slick-resizable-handle"></div></div><div style="width: 231px;" id="slickgrid_991103kojiHojoNo" class="ui-state-default slick-header-column slick-header-sortable" title=""><span class="slick-column-name">工事計画補助番号</span><span class="slick-sort-indicator"></span><div class="slick-resizable-handle"></div></div><div style="width: 411px;" id="slickgrid_991103kobetsuKojimei" class="ui-state-default slick-header-column slick-header-sortable" title=""><span class="slick-column-name">個別工
+事名</span><span class="slick-sort-indicator"></span><div class="slick-resizable-handle"></div></div><div style="width: 121px;" id="slickgrid_991103kanryoYoteibi" class="ui-state-default slick-header-column slick-header-sortable" title=""><span class="slick-column-name">完了予定日</span><span class="slick-sort-indicator"></span><div class="slick-resizable-handle"></div></div><div style="width: 121px;" id="slickgrid_991103torokubi" class="ui-state-default slick-header-column
+slick-header-sortable" title=""><span class="slick-column-name">個別工事登録日</span><span class="slick-sort-indicator"></span><div class="slick-resizable-handle"></div></div><div style="width: 261px;" id="slickgrid_991103torokushaMei" class="ui-state-default slick-header-column slick-header-sortable" title=""><span class="slick-column-name">個別工事登録者名</span><span class="slick-sort-indicator"></span><div class="slick-resizable-handle"></div></div></div></div><div style="overflow: hidden;
+position: relative;" class="slick-headerrow ui-state-default"><div style="width: 1630px;" class="slick-headerrow-columns"><div class="ui-state-default slick-headerrow-column l0 r0"><input type="text"></div><div class="ui-state-default slick-headerrow-column l1 r1"><input type="text"></div><div class="ui-state-default slick-headerrow-column l2 r2"><input type="text"></div><div class="ui-state-default slick-headerrow-column l3 r3"><input type="text"></div><div class="ui-state-default
+slick-headerrow-column l4 r4"><input type="text"></div><div class="ui-state-default slick-headerrow-column l5 r5"><input type="text"></div><div class="ui-state-default slick-headerrow-column l6 r6"><input type="text"></div></div><div style="left: 0px; top: 0px; width: 1630px; height: 1px; display: block; position: absolute;"></div></div><div style="overflow: hidden; display: none; position: relative;" class="slick-top-panel-scroller ui-state-default"><div style="width: 10000px;"
+class="slick-top-panel"></div></div><div style="outline: 0px; width: 100%; height: 474px; overflow: auto; position: relative; overflow-y: auto;" class="slick-viewport"><div style="width: 1630px; height: 457px;" class="grid-canvas"></div></div><div hideFocus="" style="outline: 0px; left: 0px; top: 0px; width: 0px; height: 0px; position: fixed;" tabIndex="0"></div></div>
+    </div>
+  </div>
+
+  <!--ボタン設定 -->
+  <div class="form-group col-xs-12 text-center">
+    <div class="row">
+      <form id="confirm-form" class="form-group" method="POST" action="/orion/i0201z/confirm">
+        <input name="_csrf" value="34054fdd-768a-463e-b6be-a2100e679497" type="hidden">
+        <button id="setting-button" class="btn btn-color " disabled="" type="button">更新対象の確認</button>
+      </form>
+    </div>
+    <div class="row">
+      <button id="back-button" class="btn btn-color " type="button">前画面に戻る</button>
+    </div>
+  </div>
+
+
+  <script src="/orion/resources/vendor/jquery/jquery-1.11.1.min.js"></script>
+  <script src="/orion/resources/vendor/bootstrap/bootstrap.min.js"></script>
+
+  <script src="/orion/resources/vendor/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+
+  <script src="/orion/resources/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+  <script src="/orion/resources/vendor/bootstrap-datepicker/js/bootstrap-datepicker.ja.min.js"></script>
+
+
+  <script src="/orion/resources/vendor/slickgrid/lib/jquery.event.drag-2.2.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/slick.core.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/slick.grid.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/slick.formatters.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/slick.editors.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/slick.dataview.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/plugins/slick.cellrangedecorator.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/plugins/slick.cellrangeselector.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/plugins/slick.cellselectionmodel.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/plugins/slick.rowselectionmodel.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/plugins/slick.rowmovemanager.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/plugins/slick.autotooltips.js"></script>
+  <script src="/orion/resources/vendor/slickgrid/controls/slick.columnpicker.js"></script>
+  <script src="/orion/resources/vendor/slickgrid-colgroup-plugin/dist/slick.colgroup.js"></script>
+  <script src="/orion/resources/js/commons/util-slickgrid.js"></script>
+
+
+  <script src="/orion/resources/js/commons/utils.js"></script>
+
+
+  <script src="/orion/resources/js/page-specifics/a02/a0203a.js"></script><div aria-hidden="true" style="display: none;" id="a0203a_modal" class="modal">  <div class="modal-dialog" role="document">    <div class="modal-content">      <div class="modal-header">        <span id="a0203a_title"></span>      </div>      <div class="modal-body">        <table id="a0203a_body_area">          <tbody><tr>            <td id="a0203a_icon_area">              <i id="a0203a_iconC" class="glyphicon
+glyphicon-question-sign"></i>              <i id="a0203a_iconI" class="glyphicon glyphicon-info-sign"></i>              <i id="a0203a_iconW" class="glyphicon glyphicon-warning-sign"></i>              <i id="a0203a_iconE" class="glyphicon glyphicon-remove-sign"></i>              <i id="a0203a_iconS" class="glyphicon glyphicon-remove-circle"></i>            </td>            <td id="a0203a_msg_area">              <span id="a0203a_msg"></span>            </td>          </tr>        </tbody></table>
+</div>      <div id="a0203a_footer_area" class="modal-footer">        <button id="a0203a_buttonOk" class="btn btn-color">OK</button>        <button id="a0203a_buttonCancel" class="btn btn-color">キャンセル</button>      </div>    </div>  </div></div>
+  <script src="/orion/resources/js/page-specifics/i02/i0201z.js"></script>
+
+
+<ul class="typeahead typeahead-long dropdown-menu"></ul><ul class="typeahead typeahead-long dropdown-menu"></ul></body><div><span></span></div></html>

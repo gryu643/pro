@@ -1,18 +1,11 @@
 from selenium import webdriver
-import chromedriver_binary
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-from time import sleep
 
 # CONST
 URL = 'https://www.netflix.com/jp/login?nextpage=https%3A%2F%2Fwww.netflix.com%2Fbrowse%2Fgenre%2F34399'
-DRIVER_PATH = '/mnt/c/Users/Ryusuke/wsl_home/chromedriver/chromedriver.exe'
+DRIVER_PATH = './chromedriver.exe'
 ID = 'ps34h.k.r@gmail.com'
 PASSWORD = 'ryusuke43'
 
@@ -38,7 +31,7 @@ def main():
     driver.get(URL)
 
     # 待機
-    element = wait.until(EC.visibility_of_all_elements_located)
+    wait.until(EC.visibility_of_all_elements_located)
 
     # id入力
     id = driver.find_element_by_id('id_userLoginId')
@@ -52,12 +45,9 @@ def main():
     buttons = driver.find_elements_by_tag_name('button')
 
     for button in buttons:
-        print(button.text)
         if button.text == 'ログイン':
             button.click()
             break
-
-    sleep(10)
 
 
 if __name__ == '__main__':

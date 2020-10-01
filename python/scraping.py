@@ -21,8 +21,7 @@ def main():
     # options.add_argument('--headless')  # ※ヘッドレスモードを使用する場合、コメントアウトを外す
 
     # ブラウザの起動
-    driver = webdriver.Chrome(
-        executable_path=DRIVER_PATH, options=options)
+    driver = webdriver.Chrome(executable_path=DRIVER_PATH, options=options)
 
     # 待機処理
     wait = WebDriverWait(driver, 10)

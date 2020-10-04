@@ -14,6 +14,9 @@ class Application(tk.Frame):
         # ウィンドウの大きさを指定
         master.geometry('800x600')
 
+        # ウィンドウの大きさの変更を規定
+        master.resizable(width=False, height=False)
+
         # ウィンドウのグリッドを 1x1 にする
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -24,12 +27,14 @@ class Application(tk.Frame):
 
         self.frame_material.grid(row=0, column=0, sticky='NSEW')
 
+        self.frame_material.grid_propagate(0)
+
         # 検索フレーム
         self.frame_search = ttk.Frame(self.frame_material)
         self.frame_search.pack(expand=False, fill=tk.X)
 
         # 検索対象ラベル作成
-        self.label1 = ttk.Label(self.frame_search, text='検索対象：')
+        self.label1 = ttk.Label(self.frame_search, text='検索対象')
         self.label1.grid(row=0, column=0)
 
         # 検索列設定コンボボックス作成
@@ -71,6 +76,8 @@ class Application(tk.Frame):
         self.frame_table = ttk.Frame(self.frame_material)
         self.frame_table.pack(expand=False, fill=tk.X)
 
+        # self.frame_table.pack_propagate(0)
+
         # 表の作成
         self.tree = ttk.Treeview(self.frame_table)
 
@@ -94,13 +101,41 @@ class Application(tk.Frame):
         self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
         self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
 
-        self.frame_table.grid_propagate(False)
-
         self.tree.pack(pady=10, side=tk.TOP, fill=tk.X)
 
+        # スクロールバーの作成
+        # 横方向
+        '''
+        self.hscrollbar = ttk.Scrollbar(self.tree, orient=tk.HORIZONTAL,
+                                        command=self.tree.xview
+                                        )
+        self.tree.configure(xscrollcommand=lambda f,
+                            l: self.hscrollbar.set(f, l))
+        self.hscrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+
+        # 立て方向
+        self.vscrollbar = ttk.Scrollbar(self.tree, orient=tk.VERTICAL,
+                                        command=self.tree.yview
+                                        )
+        self.tree.configure(xscrollcommand=lambda f,
+                            l: self.vscrollbar.set(f, l))
+        self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        '''
+
         # 下バー
+        self.frame_bar = ttk.Frame(self.frame_material)
         self.canvas1 = tk.Canvas(
-            self.frame_material, width=100, height=50, bg='blue')
+            self.frame_material, width=100, height=50, bg='gainsboro')
+        self.canvas1.pack(side=tk.BOTTOM, fill=tk.X)
+
+        self.frame_bar.pack_propagate(0)
+        self.frame_bar.pack(side=tk.BOTTOM)
+
+        self.button_change = ttk.Button(self.canvas1, text='change',
+                                        command=lambda: self.change_page(
+                                            self.frame_organization)
+                                        )
+        self.button_change.pack(side=tk.TOP)
 
         # --------------------------------------------------
         # -----組織検索フレーム------------------------------
@@ -113,6 +148,11 @@ class Application(tk.Frame):
                                 anchor='center', font=('Helvetica', '35'))
 
         self.label2.pack()
+
+        self.button2 = ttk.Button(self.frame_organization, text='change',
+                                  command=lambda: self.change_page(self.frame_material))
+
+        self.button2.pack(side=tk.TOP)
 
         # --------------------------------------------------
         # -----連絡先検索フレーム----------------------------

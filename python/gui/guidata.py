@@ -20,11 +20,6 @@ class Application(tk.Frame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        # -----画面遷移ボタンの作成-------------------------
-        # 画面下部バーの設定
-        self.make_underbar(master)
-        # -------------------------------------------------
-
         # -----物品検索フレーム-----------------------------
         # 物品検索ページフレーム作成
         self.frame_material = ttk.Frame(master, padding=16)
@@ -170,6 +165,11 @@ class Application(tk.Frame):
 
         # --------------------------------------------------
 
+        # -----画面遷移ボタンの作成-------------------------
+        # 画面下部バーの設定
+        self.make_underbar(master)
+        # -------------------------------------------------
+
         # frame_materialを一番上に表示
         self.frame_material.tkraise()
 
@@ -191,88 +191,66 @@ class Application(tk.Frame):
             self.frame_bar)
         self.canvas_under.pack(side=tk.BOTTOM, fill=tk.X)
 
-        # ボタン間の間隔(=padx)の設定
-        padx_button = 45
-
         # 物品検索ボタンフレーム
-        self.frame_button1 = ttk.Frame(self.canvas_under)
-        self.frame_button1.pack(side=tk.LEFT, padx=padx_button)
-
-        # イメージの作成
-        image_souchi = Image.open('./image/souchi.png')
-        image_souchi = image_souchi.resize((50, 50))
-        self.img_souchi = ImageTk.PhotoImage(image_souchi)
-
-        # 物品検索ページへの遷移ボタン作成
-        self.button_change1 = ttk.Button(
-            self.frame_button1, text='物品検索',
-            command=lambda: self.change_page(self.frame_material),
-            image=self.img_souchi
+        self.button_material = make_button(
+            move_page=self.frame_material,
+            canvas=self.canvas_under,
+            image_path='./image/server.png',
+            label_name='物品検索',
+            order=3
         )
-        self.button_change1.grid(row=0, column=0)
-
-        # 物品検索ラベル作成
-        self.label_change1 = ttk.Label(
-            self.frame_button1, text='物品検索'
-        )
-        self.label_change1.grid(row=1, column=0)
 
         # 組織検索ボタンフレーム
-        self.frame_button2 = ttk.Frame(self.canvas_under)
-        self.frame_button2.pack(side=tk.LEFT, padx=padx_button)
-
-        # 組織検索ページへの遷移ボタン作成
-        self.button_change2 = ttk.Button(
-            self.canvas_under, text='組織検索',
-            command=lambda: self.change_page(self.frame_organization)
+        self.button_organization = make_button(
+            move_page=self.frame_organization,
+            canvas=self.canvas_under,
+            image_path='./image/location.png',
+            label_name='組織検索',
+            order=1
         )
-        self.button_change2.pack(side=tk.LEFT)
-
-        # 組織検索ラベル作成
-        self.label_change2 = ttk.Label(
-            self.frame_button2, text='組織検索'
-        )
-        self.label_change2.pack(side=tk.TOP)
 
         # 連絡先検索ボタンフレーム
-        self.frame_button3 = ttk.Frame(self.canvas_under)
-        self.frame_button3.pack(side=tk.LEFT, padx=padx_button)
-
-        # 連絡先検索ページへの遷移ボタン作成
-        self.button_change3 = ttk.Button(
-            self.frame_button3, text='連絡先検索',
-            command=lambda: self.change_page(self.frame_contact)
+        self.button_contact = make_button(
+            move_page=self.frame_contact,
+            canvas=self.canvas_under,
+            image_path='./image/phone.png',
+            label_name='連絡先検索',
+            order=2
         )
-        self.button_change3.pack(side=tk.LEFT)
-
-        # 連絡先検索ラベル作成
-        self.label_change3 = ttk.Label(
-            self.frame_button3, text='連絡先検索'
-        )
-        self.label_change3.pack(side=tk.TOP)
 
         # csvインポートフレーム
+        self.button_import = make_button(
+            move_page=self.frame_import,
+            canvas=self.canvas_under,
+            image_path='./image/file.png',
+            label_name='csvインポート',
+            order=3
+        )
+
+
+class make_button(Application):
+    def __init__(self, move_page, canvas, image_path, label_name, order):
         # イメージの作成
-        image = Image.open('./image/file.png')
-        image = image.resize((50, 50))
+        image = Image.open(image_path)
+        image = image.resize((50, 60))
         self.img = ImageTk.PhotoImage(image)
 
-        self.frame_button4 = ttk.Frame(self.canvas_under)
-        self.frame_button4.pack(side=tk.LEFT, padx=padx_button)
+        self.frame_button = ttk.Frame(canvas, relief='flat')
+        self.frame_button.pack(side=tk.LEFT, padx=60)
 
-        # csvインポートページへの遷移ボタン作成
-        self.button_change4 = ttk.Button(
-            self.frame_button4, text='csvインポート',
-            command=lambda: self.change_page(self.frame_import),
+        # 遷移ボタン作成
+        self.button_change = ttk.Button(
+            self.frame_button,
+            command=lambda: self.change_page(move_page),
             image=self.img
         )
-        self.button_change4.grid(row=0, column=3)
+        self.button_change.grid(row=0, column=order)
 
-        # csvインポートラベル作成
-        self.label_change4 = ttk.Label(
-            self.frame_button4, text='csvインポート'
+        # ラベル作成
+        self.label_change = ttk.Label(
+            self.frame_button, text=label_name
         )
-        self.label_change4.grid(row=1, column=3)
+        self.label_change.grid(row=1, column=order)
 
 
 if __name__ == '__main__':

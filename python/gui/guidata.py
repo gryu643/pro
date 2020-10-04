@@ -20,11 +20,16 @@ class Application(tk.Frame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # -----画面遷移ボタンの作成-------------------------
+        # 画面下部バーの設定
+        self.make_underbar(master)
+        # -------------------------------------------------
+
         # -----物品検索フレーム-----------------------------
         # 物品検索ページフレーム作成
         self.frame_material = ttk.Frame(master, padding=16)
 
-        self.frame_material.grid(row=0, column=0, sticky='NSEW')
+        self.frame_material.grid(row=0, column=0)
 
         self.frame_material.grid_propagate(0)
 
@@ -122,9 +127,6 @@ class Application(tk.Frame):
         self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         '''
 
-        # 画面下部バーの設定
-        self.make_underbar(self.frame_material)
-
         # --------------------------------------------------
         # -----組織検索フレーム------------------------------
         # 組織検索ページフレーム作成
@@ -142,9 +144,6 @@ class Application(tk.Frame):
 
         self.button2.pack(side=tk.TOP)
 
-        # 画面下部バーの設定
-        self.make_underbar(self.frame_organization)
-
         # --------------------------------------------------
         # -----連絡先検索フレーム----------------------------
         # 連絡先検索ページフレーム作成
@@ -157,8 +156,6 @@ class Application(tk.Frame):
 
         self.label3.pack()
 
-        # 画面下部バーの設定
-        self.make_underbar(self.frame_contact)
         # --------------------------------------------------
         # -----csvインポート検索フレーム---------------------
         # csvインポートページフレーム作成
@@ -171,8 +168,6 @@ class Application(tk.Frame):
 
         self.label4.pack()
 
-        # 画面下部バーの設定
-        self.make_underbar(self.frame_import)
         # --------------------------------------------------
 
         # frame_materialを一番上に表示
@@ -188,13 +183,12 @@ class Application(tk.Frame):
     def make_underbar(self, frame_parent):
         # 下バー
         # ウィンドウ下部バーフレームの作成
-        self.frame_bar = ttk.Frame(frame_parent)
-        self.frame_bar.pack_propagate(0)
-        self.frame_bar.pack(anchor=tk.S)
+        self.frame_bar = ttk.Frame(frame_parent, padding=10)
+        self.frame_bar.grid(row=1, column=0)
 
         # キャンバスの作成
         self.canvas_under = tk.Canvas(
-            frame_parent, bg='gainsboro')
+            self.frame_bar)
         self.canvas_under.pack(side=tk.BOTTOM, fill=tk.X)
 
         # ボタン間の間隔(=padx)の設定

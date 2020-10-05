@@ -20,33 +20,64 @@ class Application(tk.Frame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # 下部バーのスタイル作成
+        self.s = ttk.Style()
+        self.s.theme_use('clam')
+        self.s.configure(
+            'MyWidget.TButton',
+            background='PaleTurquoise3',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='flat'
+        )
+
+        # ページのスタイル作成
+        self.ss = ttk.Style()
+        self.ss.configure(
+            'Page.TButton',
+            background='SlateGray4',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='flat'
+        )
+
+        # ページのスタイル作成
+        self.sss = ttk.Style()
+        self.sss.configure(
+            'Button.TButton',
+            width=8,
+            height=3
+        )
+
         # -----物品検索フレーム-----------------------------
         # 物品検索ページフレーム作成
-        self.frame_material = ttk.Frame(master, padding=16)
-
+        self.frame_material = ttk.Frame(
+            master,
+            padding=18,
+            style='Page.TButton'
+        )
         self.frame_material.grid(row=0, column=0)
 
-        self.frame_material.grid_propagate(0)
-
-        # ページタイトルフレーム作成
-        self.frame_title1 = ttk.Frame(self.frame_material)
-        self.frame_title1.pack(anchor=tk.NW, expand=False, fill=tk.X)
-
-        # タイトルラベル作成
-        self.label_title1 = ttk.Label(
-            self.frame_title1,
-            text='物品検索',
-            font=('Helvetica', '18')
+        # ページタイトル作成
+        self.title_material = makeTitle(
+            parent=self.frame_material,
+            file_path='./image/server.png',
+            title='物品検索'
         )
-        self.label_title1.pack(anchor=tk.NW, side=tk.TOP, fill=tk.X)
 
         # 検索フレーム
         self.frame_search = ttk.Frame(
-            self.frame_material)
+            self.frame_material,
+            style='Page.TButton')
         self.frame_search.pack(expand=False, fill=tk.X)
 
         # 検索対象ラベル作成
-        self.label1 = ttk.Label(self.frame_search, text='検索対象')
+        self.label1 = ttk.Label(
+            self.frame_search,
+            text='検索対象',
+            style='Page.TButton',
+            font=('Helvetica', '10')
+        )
         self.label1.grid(row=0, column=0, sticky=tk.W, pady=5)
 
         # 検索列設定コンボボックス作成
@@ -61,37 +92,49 @@ class Application(tk.Frame):
             self.frame_search, state='readonly', value=self.types,
             textvariable=self.combovalue
         )
-
         # 初期選択値設定
         self.combo1.current(0)
-
-        self.combo1.grid(row=0, column=1, pady=5)
+        self.combo1.grid(row=0, column=1, pady=5, sticky=tk.W)
 
         # 検索ワードラベル作成
-        self.label5 = ttk.Label(self.frame_search, text='検索ワード')
-        self.label5.grid(row=1, column=0, pady=5)
+        self.label5 = ttk.Label(
+            self.frame_search,
+            text='検索ワード',
+            style='Page.TButton',
+            font=('Helvetica', '10')
+        )
+        self.label5.grid(row=1, column=0, pady=5, sticky=tk.W)
 
         # 検索ワードエントリーの作成
         self.t = tk.StringVar
-        self.entry1 = ttk.Entry(self.frame_search, textvariable=self.t)
-        self.entry1.grid(row=1, column=1, pady=5)
+        self.entry1 = ttk.Entry(
+            self.frame_search,
+            textvariable=self.t,
+            width=30
+        )
+        self.entry1.grid(row=1, column=1, pady=5, sticky=tk.W)
 
         # 検索ボタン
         self.button1 = ttk.Button(
             self.frame_search,
-            text=u'検索',
-            command=lambda: self.get_keyword()
+            text=u'検 索',
+            command=lambda: self.get_keyword(),
+            style='Button.TButton'
         )
-        self.button1.grid(row=1, column=2, pady=5)
+        self.button1.grid(row=1, column=2, pady=5, padx=2)
 
         # 表フレーム作成
-        self.frame_table = ttk.Frame(self.frame_material)
+        self.frame_table = ttk.Frame(
+            self.frame_material,
+            style='Page.TButton'
+        )
         self.frame_table.pack(expand=False, fill=tk.X)
 
-        # self.frame_table.pack_propagate(0)
-
         # 表の作成
-        self.tree = ttk.Treeview(self.frame_table, height=10)
+        self.tree = ttk.Treeview(
+            self.frame_table,
+            height=10
+        )
 
         # 列の定義
         self.tree['columns'] = (1, 2, 3, 4)
@@ -113,7 +156,7 @@ class Application(tk.Frame):
         self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
         self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
 
-        self.tree.pack(pady=10, side=tk.TOP, fill=tk.X)
+        self.tree.pack(side=tk.TOP, fill=tk.X)
 
         # スクロールバーの作成
         # 横方向
@@ -137,32 +180,53 @@ class Application(tk.Frame):
         # --------------------------------------------------
         # -----組織検索フレーム------------------------------
         # 組織検索ページフレーム作成
-        self.frame_organization = ttk.Frame(master, padding=16)
+        self.frame_organization = ttk.Frame(
+            master,
+            padding=18,
+            style='Page.TButton'
+        )
         self.frame_organization.grid(row=0, column=0, sticky='nsew')
 
-        self.label2 = ttk.Label(self.frame_organization, text='組織検索画面',
-                                anchor='center', font=('Helvetica', '35'))
-        self.label2.pack()
-
-        self.button2 = ttk.Button(self.frame_organization, text='change',
-                                  command=lambda: self.changePage(self.frame_material))
-        self.button2.pack(side=tk.TOP)
+        # ページタイトル作成
+        self.title_organization = makeTitle(
+            parent=self.frame_organization,
+            file_path='./image/shakehand.png',
+            title='組織検索'
+        )
 
         # --------------------------------------------------
         # -----連絡先検索フレーム----------------------------
         # 連絡先検索ページフレーム作成
-        self.frame_contact = ttk.Frame(master, padding=16)
+        self.frame_contact = ttk.Frame(
+            master,
+            padding=18,
+            style='Page.TButton'
+        )
         self.frame_contact.grid(row=0, column=0, sticky='nsew')
 
-        self.label3 = ttk.Label(self.frame_contact, text='連絡先検索画面',
-                                anchor='center', font=('Helvetica', '35'))
-        self.label3.pack()
+        # ページタイトル作成
+        self.title_contact = makeTitle(
+            parent=self.frame_contact,
+            file_path='./image/phone.png',
+            title='連絡先検索'
+        )
         # --------------------------------------------------
 
         # -----csvインポート検索フレーム---------------------
         # csvインポートページフレーム作成
-        self.frame_import = ttk.Frame(master, padding=16)
+        self.frame_import = ttk.Frame(
+            master,
+            padding=16,
+            style='Page.TButton'
+        )
         self.frame_import.grid(row=0, column=0, sticky='nsew')
+
+        # ページタイトル作成
+        self.title_import = makeTitle(
+            parent=self.frame_import,
+            file_path='./image/file.png',
+            title='csvインポート'
+        )
 
         # csvインポートページのウィジェット作成
         self.makePageImport(self.frame_import)
@@ -180,39 +244,18 @@ class Application(tk.Frame):
         page.tkraise()
 
     def makePageImport(self, frame_parent):
-        # ページタイトルフレーム作成
-        self.frame_title4 = ttk.Frame(self.frame_import)
-        self.frame_title4.pack(anchor=tk.NW, expand=False, fill=tk.X)
-
-        # タイトルラベル作成
-        self.label_title4 = ttk.Label(
-            self.frame_title4,
-            text='csvインポート',
-            font=('Helvetica', '18')
-        )
-        self.label_title4.pack(anchor=tk.NW, fill=tk.X)
-
         # csvファイル1ウィジェット群作成
-        self.widgets_csv1 = makeCSVWidget(parent=self.frame_title4)
+        self.widgets_csv1 = makeCSVWidget(parent=frame_parent)
 
         # csvファイル2ウィジェット群作成
-        self.widgets_csv2 = makeCSVWidget(parent=self.frame_title4)
+        self.widgets_csv2 = makeCSVWidget(parent=frame_parent)
 
     def makeFrameUnder(self, frame_parent):
-        # スタイル作成
-        self.s = ttk.Style()
-        self.s.configure(
-            'FrameUnder.TButton',
-            background='Whitesmoke',
-            borderwidth=0
-        )
-
         # ウィンドウ下部バーフレームの作成
         self.frame_bar = ttk.Frame(
             frame_parent,
-            style='FrameUnder.TButton',
+            style='MyWidget.TButton',
             padding=5,
-            relief='flat'
         )
         self.frame_bar.grid(row=1, column=0, sticky=tk.W+tk.E)
 
@@ -253,16 +296,53 @@ class Application(tk.Frame):
         )
 
 
-class makeCSVWidget():
+class makeTitle(Application):
+    def __init__(self, parent, file_path, title):
+        # ページタイトルフレーム作成
+        self.frame_title = ttk.Frame(
+            parent,
+            style='Page.TButton'
+        )
+        self.frame_title.pack(anchor=tk.NW)
+
+        # イメージの作成
+        self.image = Image.open(file_path)
+        self.image = self.image.resize((50, 50))
+        self.img = ImageTk.PhotoImage(self.image)
+
+        # イメージラベル作成
+        self.label_icon = ttk.Label(
+            self.frame_title,
+            image=self.img,
+            style='Page.TButton'
+        )
+        self.label_icon.pack(side=tk.LEFT)
+
+        # タイトルラベル作成
+        self.label_title = ttk.Label(
+            self.frame_title,
+            text=title,
+            style='Page.TButton',
+            font=('Helvetica', '18')
+        )
+        self.label_title.pack(anchor=tk.W, side=tk.LEFT)
+
+
+class makeCSVWidget(Application):
     def __init__(self, parent):
         # csvファイル1 フレーム作成
-        self.frame = ttk.Frame(parent)
+        self.frame = ttk.Frame(
+            parent,
+            style='Page.TButton'
+        )
         self.frame.pack(anchor=tk.CENTER, pady=10)
 
         # csvファイル1 ラベル作成
         self.label = ttk.Label(
             self.frame,
             text='csvファイル1',
+            style='Page.TButton',
+            font=('Helvetica', '10')
         )
         self.label.grid(row=0, column=0, sticky=tk.W)
 
@@ -278,10 +358,16 @@ class makeCSVWidget():
         # csvファイル1 参照ボタン作成
         self.button_reference = ttk.Button(
             self.frame,
-            text='参照',
-            command=lambda: self.showDialog(t)
+            text=u'参 照',
+            command=lambda: self.showDialog(t),
+            style='Button.TButton'
         )
-        self.button_reference.grid(row=1, column=1, sticky=tk.W)
+        self.button_reference.grid(
+            row=1,
+            column=1,
+            sticky=tk.W,
+            padx=5
+        )
 
         # csvファイル1 importボタン作成
         self.button_import = ttk.Button(
@@ -303,8 +389,7 @@ class makeButton(Application):
 
         self.frame_button = ttk.Frame(
             parent,
-            relief='flat',
-            style='FrameUnder.TButton',
+            style='MyWidget.TButton'
         )
         self.frame_button.pack(side=tk.LEFT, padx=60)
 
@@ -313,6 +398,7 @@ class makeButton(Application):
             self.frame_button,
             command=lambda: self.changePage(move_page),
             image=self.img,
+            style='MyWidget.TButton'
         )
         self.button_change.grid(row=0, column=order)
 
@@ -320,8 +406,7 @@ class makeButton(Application):
         self.label_change = ttk.Label(
             self.frame_button,
             text=label_name,
-            style='FrameUnder.TButton',
-            relief='flat'
+            style='MyWidget.TButton'
         )
         self.label_change.grid(row=1, column=order)
 

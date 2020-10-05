@@ -36,7 +36,7 @@ class Application(tk.Frame):
         self.label_title1 = ttk.Label(
             self.frame_title1,
             text='物品検索',
-            font=('Helvetica', '18')    
+            font=('Helvetica', '18')
         )
         self.label_title1.pack(anchor=tk.NW, side=tk.TOP, fill=tk.X)
 
@@ -182,28 +182,39 @@ class Application(tk.Frame):
     def makePageImport(self, frame_parent):
         # ページタイトルフレーム作成
         self.frame_title4 = ttk.Frame(self.frame_import)
-        self.frame_title4.pack(anchor=tk.NW,expand=False, fill=tk.X)
+        self.frame_title4.pack(anchor=tk.NW, expand=False, fill=tk.X)
 
         # タイトルラベル作成
         self.label_title4 = ttk.Label(
             self.frame_title4,
             text='csvインポート',
-            font=('Helvetica', '18')    
+            font=('Helvetica', '18')
         )
         self.label_title4.pack(anchor=tk.NW, fill=tk.X)
 
         # csvファイル1ウィジェット群作成
         self.widgets_csv1 = makeCSVWidget(parent=self.frame_title4)
-        
+
         # csvファイル2ウィジェット群作成
         self.widgets_csv2 = makeCSVWidget(parent=self.frame_title4)
 
-    
     def makeFrameUnder(self, frame_parent):
-        # 下バー
+        # スタイル作成
+        self.s = ttk.Style()
+        self.s.configure(
+            'FrameUnder.TButton',
+            background='Whitesmoke',
+            borderwidth=0
+        )
+
         # ウィンドウ下部バーフレームの作成
-        self.frame_bar = ttk.Frame(frame_parent, padding=10)
-        self.frame_bar.grid(row=1, column=0)
+        self.frame_bar = ttk.Frame(
+            frame_parent,
+            style='FrameUnder.TButton',
+            padding=5,
+            relief='flat'
+        )
+        self.frame_bar.grid(row=1, column=0, sticky=tk.W+tk.E)
 
         # 物品検索ボタンフレーム
         self.button_material = makeButton(
@@ -218,7 +229,7 @@ class Application(tk.Frame):
         self.button_organization = makeButton(
             move_page=self.frame_organization,
             parent=self.frame_bar,
-            image_path='./image/location.png',
+            image_path='./image/shakehand.png',
             label_name='組織検索',
             order=1
         )
@@ -241,18 +252,19 @@ class Application(tk.Frame):
             order=3
         )
 
+
 class makeCSVWidget():
     def __init__(self, parent):
         # csvファイル1 フレーム作成
         self.frame = ttk.Frame(parent)
-        self.frame.pack(anchor=tk.CENTER,pady=10)
+        self.frame.pack(anchor=tk.CENTER, pady=10)
 
         # csvファイル1 ラベル作成
         self.label = ttk.Label(
             self.frame,
             text='csvファイル1',
         )
-        self.label.grid(row=0,column=0, sticky=tk.W)
+        self.label.grid(row=0, column=0, sticky=tk.W)
 
         # csvファイル1 エントリー作成
         t = tk.StringVar()
@@ -269,39 +281,47 @@ class makeCSVWidget():
             text='参照',
             command=lambda: self.showDialog(t)
         )
-        self.button_reference.grid(row=1,column=1, sticky=tk.W)
+        self.button_reference.grid(row=1, column=1, sticky=tk.W)
 
         # csvファイル1 importボタン作成
         self.button_import = ttk.Button(
             self.frame,
             text='Import'
         )
-        self.button_import.grid(row=2,column=0, sticky=tk.W)
+        self.button_import.grid(row=2, column=0, sticky=tk.W)
 
     def showDialog(self, input):
         pass
 
+
 class makeButton(Application):
     def __init__(self, move_page, parent, image_path, label_name, order):
         # イメージの作成
-        #image = Image.open(image_path)
-        #image = image.resize((50, 60))
-        #self.img = ImageTk.PhotoImage(image)
+        image = Image.open(image_path)
+        image = image.resize((50, 50))
+        self.img = ImageTk.PhotoImage(image)
 
-        self.frame_button = ttk.Frame(parent, relief='flat')
+        self.frame_button = ttk.Frame(
+            parent,
+            relief='flat',
+            style='FrameUnder.TButton',
+        )
         self.frame_button.pack(side=tk.LEFT, padx=60)
 
         # 遷移ボタン作成
         self.button_change = ttk.Button(
             self.frame_button,
             command=lambda: self.changePage(move_page),
-            #image=self.img
+            image=self.img,
         )
         self.button_change.grid(row=0, column=order)
 
         # ラベル作成
         self.label_change = ttk.Label(
-            self.frame_button, text=label_name
+            self.frame_button,
+            text=label_name,
+            style='FrameUnder.TButton',
+            relief='flat'
         )
         self.label_change.grid(row=1, column=order)
 

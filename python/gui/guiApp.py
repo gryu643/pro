@@ -267,7 +267,7 @@ class Table(ttk.Frame):
             master,
             style='Page.TButton'
         )
-        self.frame_table.pack(expand=False, fill=tk.BOTH)
+        self.frame_table.pack(expand=True, fill=tk.BOTH)
 
         # 表の作成
         self.tree = ttk.Treeview(
@@ -310,26 +310,23 @@ class Table(ttk.Frame):
         self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
         self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
 
-        self.tree.pack(side=tk.TOP, fill=tk.X)
+        self.tree.grid(row=0, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
 
         # スクロールバーの作成
         # 横方向
-        '''
-                    self.hscrollbar = ttk.Scrollbar(self.tree, orient=tk.HORIZONTAL,
-                                                    command=self.tree.xview
-                                                    )
-                    self.tree.configure(xscrollcommand=lambda f,
-                                        l: self.hscrollbar.set(f, l))
-                    self.hscrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        self.bar_x = ttk.Scrollbar(self.frame_table, orient=tk.HORIZONTAL)
+        self.bar_x.grid(row=1, column=0, sticky=tk.W+tk.E)
+        self.bar_x.config(command=self.tree.xview)
 
-                    # 立て方向
-                    self.vscrollbar = ttk.Scrollbar(self.tree, orient=tk.VERTICAL,
-                                                    command=self.tree.yview
-                                                    )
-                    self.tree.configure(xscrollcommand=lambda f,
-                                        l: self.vscrollbar.set(f, l))
-                    self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-                    '''
+        # 縦方向
+        self.bar_y = ttk.Scrollbar(self.frame_table, orient=tk.VERTICAL)
+        self.bar_y.grid(row=0, column=1, sticky=tk.N+tk.S)
+        self.bar_y.config(command=self.tree.yview)
+
+        self.tree.config(
+            yscrollcommand=self.bar_y.set,
+            xscrollcommand=self.bar_x.set
+        )
 
 
 class makeTitle(Application):

@@ -56,7 +56,7 @@ class Application(tk.Frame):
             padding=18,
             style='Page.TButton'
         )
-        self.frame_material.grid(row=0, column=0)
+        self.frame_material.grid(row=0, column=0, sticky=tk.N+tk.W+tk.S+tk.E)
 
         # ページタイトル作成
         self.title_material = makeTitle(
@@ -65,7 +65,7 @@ class Application(tk.Frame):
             title='物品検索'
         )
 
-        # csvインポートページのウィジェット作成
+        # 物品検索ページのウィジェット作成
         self.makePageMaterial(self.frame_material)
         # --------------------------------------------------
 
@@ -76,7 +76,8 @@ class Application(tk.Frame):
             padding=18,
             style='Page.TButton'
         )
-        self.frame_organization.grid(row=0, column=0, sticky='nsew')
+        self.frame_organization.grid(
+            row=0, column=0, sticky=tk.N+tk.W+tk.S+tk.E)
 
         # ページタイトル作成
         self.title_organization = makeTitle(
@@ -93,7 +94,7 @@ class Application(tk.Frame):
             padding=18,
             style='Page.TButton'
         )
-        self.frame_contact.grid(row=0, column=0, sticky='nsew')
+        self.frame_contact.grid(row=0, column=0, sticky=tk.N+tk.W+tk.S+tk.E)
 
         # ページタイトル作成
         self.title_contact = makeTitle(
@@ -110,7 +111,7 @@ class Application(tk.Frame):
             padding=16,
             style='Page.TButton'
         )
-        self.frame_import.grid(row=0, column=0, sticky='nsew')
+        self.frame_import.grid(row=0, column=0, sticky=tk.N+tk.W+tk.S+tk.E)
 
         # ページタイトル作成
         self.title_import = makeTitle(
@@ -188,64 +189,19 @@ class Application(tk.Frame):
         self.button1 = ttk.Button(
             self.frame_search,
             text=u'検 索',
-            command=lambda: self.get_keyword(),
+            command=lambda: self.makePageTable(),
             style='Button.TButton'
         )
         self.button1.grid(row=1, column=2, pady=5, padx=2)
 
-        # 表フレーム作成
-        self.frame_table = ttk.Frame(
-            parent,
-            style='Page.TButton'
-        )
-        self.frame_table.pack(expand=False, fill=tk.X)
+    def makePageTable(self):
+        # ルートウィンドウ要素の作成
+        root = tk.Tk()
 
-        # 表の作成
-        self.tree = ttk.Treeview(
-            self.frame_table,
-            height=10
-        )
+        # クラス呼び出し
+        Table(master=root)
 
-        # 列の定義
-        self.tree['columns'] = (1, 2, 3, 4)
-        self.tree['show'] = 'headings'
-        self.tree.column(1, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(2, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(3, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(4, width=190, minwidth=190, stretch=tk.NO)
-
-        # 見出しの定義
-        self.tree.heading(1, text='index', anchor=tk.W)
-        self.tree.heading(2, text='name', anchor=tk.W)
-        self.tree.heading(3, text='num', anchor=tk.W)
-        self.tree.heading(4, text='value', anchor=tk.W)
-
-        # insert
-        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
-        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
-        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
-        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
-
-        self.tree.pack(side=tk.TOP, fill=tk.X)
-
-        # スクロールバーの作成
-        # 横方向
-        '''
-        self.hscrollbar = ttk.Scrollbar(self.tree, orient=tk.HORIZONTAL,
-                                        command=self.tree.xview
-                                        )
-        self.tree.configure(xscrollcommand=lambda f,
-                            l: self.hscrollbar.set(f, l))
-        self.hscrollbar.pack(side=tk.BOTTOM, fill=tk.X)
-
-        # 立て方向
-        self.vscrollbar = ttk.Scrollbar(self.tree, orient=tk.VERTICAL,
-                                        command=self.tree.yview
-                                        )
-        self.tree.configure(xscrollcommand=lambda f,
-                            l: self.vscrollbar.set(f, l))
-        self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        '''
+        root.mainloop()
 
     def makePageImport(self, frame_parent):
         # csvファイル1ウィジェット群作成
@@ -298,6 +254,82 @@ class Application(tk.Frame):
             label_name='csvインポート',
             order=3
         )
+
+
+class Table(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+        # ウィンドウタイトルの設定
+        master.title(u'検索結果')
+
+        # 表フレーム作成
+        self.frame_table = ttk.Frame(
+            master,
+            style='Page.TButton'
+        )
+        self.frame_table.pack(expand=False, fill=tk.BOTH)
+
+        # 表の作成
+        self.tree = ttk.Treeview(
+            self.frame_table
+        )
+
+        # 列の定義
+        self.tree['columns'] = (1, 2, 3, 4)
+        self.tree['show'] = 'headings'
+        self.tree.column(1, width=190, minwidth=190, stretch=tk.NO)
+        self.tree.column(2, width=190, minwidth=190, stretch=tk.NO)
+        self.tree.column(3, width=190, minwidth=190, stretch=tk.NO)
+        self.tree.column(4, width=190, minwidth=190, stretch=tk.NO)
+
+        # 見出しの定義
+        self.tree.heading(1, text='index', anchor=tk.W)
+        self.tree.heading(2, text='name', anchor=tk.W)
+        self.tree.heading(3, text='num', anchor=tk.W)
+        self.tree.heading(4, text='value', anchor=tk.W)
+
+        # insert
+        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
+        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
+        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
+        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
+        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
+        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
+        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
+        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
+        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
+        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
+        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
+        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
+        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
+        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
+        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
+        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
+        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
+        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
+        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
+        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
+
+        self.tree.pack(side=tk.TOP, fill=tk.X)
+
+        # スクロールバーの作成
+        # 横方向
+        '''
+                    self.hscrollbar = ttk.Scrollbar(self.tree, orient=tk.HORIZONTAL,
+                                                    command=self.tree.xview
+                                                    )
+                    self.tree.configure(xscrollcommand=lambda f,
+                                        l: self.hscrollbar.set(f, l))
+                    self.hscrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+
+                    # 立て方向
+                    self.vscrollbar = ttk.Scrollbar(self.tree, orient=tk.VERTICAL,
+                                                    command=self.tree.yview
+                                                    )
+                    self.tree.configure(xscrollcommand=lambda f,
+                                        l: self.vscrollbar.set(f, l))
+                    self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+                    '''
 
 
 class makeTitle(Application):

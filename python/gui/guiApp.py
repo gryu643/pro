@@ -65,119 +65,10 @@ class Application(tk.Frame):
             title='物品検索'
         )
 
-        # 検索フレーム
-        self.frame_search = ttk.Frame(
-            self.frame_material,
-            style='Page.TButton')
-        self.frame_search.pack(expand=False, fill=tk.X)
-
-        # 検索対象ラベル作成
-        self.label1 = ttk.Label(
-            self.frame_search,
-            text='検索対象',
-            style='Page.TButton',
-            font=('Helvetica', '10')
-        )
-        self.label1.grid(row=0, column=0, sticky=tk.W, pady=5)
-
-        # 検索列設定コンボボックス作成
-        # 項目作成
-        self.types = (u'物品コード', u'カナ品名')
-
-        # コンボボックスの変数作成
-        self.combovalue = tk.StringVar()
-
-        # コンボボックス作成
-        self.combo1 = ttk.Combobox(
-            self.frame_search, state='readonly', value=self.types,
-            textvariable=self.combovalue
-        )
-        # 初期選択値設定
-        self.combo1.current(0)
-        self.combo1.grid(row=0, column=1, pady=5, sticky=tk.W)
-
-        # 検索ワードラベル作成
-        self.label5 = ttk.Label(
-            self.frame_search,
-            text='検索ワード',
-            style='Page.TButton',
-            font=('Helvetica', '10')
-        )
-        self.label5.grid(row=1, column=0, pady=5, sticky=tk.W)
-
-        # 検索ワードエントリーの作成
-        self.t = tk.StringVar
-        self.entry1 = ttk.Entry(
-            self.frame_search,
-            textvariable=self.t,
-            width=30
-        )
-        self.entry1.grid(row=1, column=1, pady=5, sticky=tk.W)
-
-        # 検索ボタン
-        self.button1 = ttk.Button(
-            self.frame_search,
-            text=u'検 索',
-            command=lambda: self.get_keyword(),
-            style='Button.TButton'
-        )
-        self.button1.grid(row=1, column=2, pady=5, padx=2)
-
-        # 表フレーム作成
-        self.frame_table = ttk.Frame(
-            self.frame_material,
-            style='Page.TButton'
-        )
-        self.frame_table.pack(expand=False, fill=tk.X)
-
-        # 表の作成
-        self.tree = ttk.Treeview(
-            self.frame_table,
-            height=10
-        )
-
-        # 列の定義
-        self.tree['columns'] = (1, 2, 3, 4)
-        self.tree['show'] = 'headings'
-        self.tree.column(1, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(2, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(3, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(4, width=190, minwidth=190, stretch=tk.NO)
-
-        # 見出しの定義
-        self.tree.heading(1, text='index', anchor=tk.W)
-        self.tree.heading(2, text='name', anchor=tk.W)
-        self.tree.heading(3, text='num', anchor=tk.W)
-        self.tree.heading(4, text='value', anchor=tk.W)
-
-        # insert
-        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
-        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
-        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
-        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
-
-        self.tree.pack(side=tk.TOP, fill=tk.X)
-
-        # スクロールバーの作成
-        # 横方向
-        '''
-        self.hscrollbar = ttk.Scrollbar(self.tree, orient=tk.HORIZONTAL,
-                                        command=self.tree.xview
-                                        )
-        self.tree.configure(xscrollcommand=lambda f,
-                            l: self.hscrollbar.set(f, l))
-        self.hscrollbar.pack(side=tk.BOTTOM, fill=tk.X)
-
-        # 立て方向
-        self.vscrollbar = ttk.Scrollbar(self.tree, orient=tk.VERTICAL,
-                                        command=self.tree.yview
-                                        )
-        self.tree.configure(xscrollcommand=lambda f,
-                            l: self.vscrollbar.set(f, l))
-        self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        '''
-
+        # csvインポートページのウィジェット作成
+        self.makePageMaterial(self.frame_material)
         # --------------------------------------------------
+
         # -----組織検索フレーム------------------------------
         # 組織検索ページフレーム作成
         self.frame_organization = ttk.Frame(
@@ -242,6 +133,119 @@ class Application(tk.Frame):
 
     def changePage(self, page):
         page.tkraise()
+
+    def makePageMaterial(self, parent):
+        # 検索フレーム
+        self.frame_search = ttk.Frame(
+            parent,
+            style='Page.TButton')
+        self.frame_search.pack(expand=False, fill=tk.X)
+
+        # 検索対象ラベル作成
+        self.label1 = ttk.Label(
+            self.frame_search,
+            text='検索対象',
+            style='Page.TButton',
+            font=('Helvetica', '10')
+        )
+        self.label1.grid(row=0, column=0, sticky=tk.W, pady=5)
+
+        # 検索列設定コンボボックス作成
+        # 項目作成
+        self.types = (u'物品コード', u'カナ品名')
+
+        # コンボボックスの変数作成
+        self.combovalue = tk.StringVar()
+
+        # コンボボックス作成
+        self.combo1 = ttk.Combobox(
+            self.frame_search, state='readonly', value=self.types,
+            textvariable=self.combovalue
+        )
+        # 初期選択値設定
+        self.combo1.current(0)
+        self.combo1.grid(row=0, column=1, pady=5, sticky=tk.W)
+
+        # 検索ワードラベル作成
+        self.label5 = ttk.Label(
+            self.frame_search,
+            text='検索ワード',
+            style='Page.TButton',
+            font=('Helvetica', '10')
+        )
+        self.label5.grid(row=1, column=0, pady=5, sticky=tk.W)
+
+        # 検索ワードエントリーの作成
+        self.t = tk.StringVar
+        self.entry1 = ttk.Entry(
+            self.frame_search,
+            textvariable=self.t,
+            width=30
+        )
+        self.entry1.grid(row=1, column=1, pady=5, sticky=tk.W)
+
+        # 検索ボタン
+        self.button1 = ttk.Button(
+            self.frame_search,
+            text=u'検 索',
+            command=lambda: self.get_keyword(),
+            style='Button.TButton'
+        )
+        self.button1.grid(row=1, column=2, pady=5, padx=2)
+
+        # 表フレーム作成
+        self.frame_table = ttk.Frame(
+            parent,
+            style='Page.TButton'
+        )
+        self.frame_table.pack(expand=False, fill=tk.X)
+
+        # 表の作成
+        self.tree = ttk.Treeview(
+            self.frame_table,
+            height=10
+        )
+
+        # 列の定義
+        self.tree['columns'] = (1, 2, 3, 4)
+        self.tree['show'] = 'headings'
+        self.tree.column(1, width=190, minwidth=190, stretch=tk.NO)
+        self.tree.column(2, width=190, minwidth=190, stretch=tk.NO)
+        self.tree.column(3, width=190, minwidth=190, stretch=tk.NO)
+        self.tree.column(4, width=190, minwidth=190, stretch=tk.NO)
+
+        # 見出しの定義
+        self.tree.heading(1, text='index', anchor=tk.W)
+        self.tree.heading(2, text='name', anchor=tk.W)
+        self.tree.heading(3, text='num', anchor=tk.W)
+        self.tree.heading(4, text='value', anchor=tk.W)
+
+        # insert
+        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
+        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
+        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
+        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
+
+        self.tree.pack(side=tk.TOP, fill=tk.X)
+
+        # スクロールバーの作成
+        # 横方向
+        '''
+        self.hscrollbar = ttk.Scrollbar(self.tree, orient=tk.HORIZONTAL,
+                                        command=self.tree.xview
+                                        )
+        self.tree.configure(xscrollcommand=lambda f,
+                            l: self.hscrollbar.set(f, l))
+        self.hscrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+
+        # 立て方向
+        self.vscrollbar = ttk.Scrollbar(self.tree, orient=tk.VERTICAL,
+                                        command=self.tree.yview
+                                        )
+        self.tree.configure(xscrollcommand=lambda f,
+                            l: self.vscrollbar.set(f, l))
+        self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        '''
 
     def makePageImport(self, frame_parent):
         # csvファイル1ウィジェット群作成

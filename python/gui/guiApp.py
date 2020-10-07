@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import Image
 from PIL import ImageTk
+from tkinter import filedialog as fd
+import os
 
 
 class Application(tk.Frame):
@@ -178,12 +180,12 @@ class Application(tk.Frame):
 
         # 検索ワードエントリーの作成
         self.t = tk.StringVar
-        self.entry1 = ttk.Entry(
+        self.entry_search = ttk.Entry(
             self.frame_search,
             textvariable=self.t,
             width=30
         )
-        self.entry1.grid(row=1, column=1, pady=5, sticky=tk.W)
+        self.entry_search.grid(row=1, column=1, pady=5, sticky=tk.W)
 
         # 検索ボタン
         self.button1 = ttk.Button(
@@ -392,7 +394,7 @@ class makeCSVWidget(Application):
         self.button_reference = ttk.Button(
             self.frame,
             text=u'参 照',
-            command=lambda: self.showDialog(t),
+            command=lambda: self.showDialog(),
             style='Button.TButton'
         )
         self.button_reference.grid(
@@ -409,8 +411,12 @@ class makeCSVWidget(Application):
         )
         self.button_import.grid(row=2, column=0, sticky=tk.W)
 
-    def showDialog(self, input):
-        pass
+    def showDialog(self):
+        fTyp = [("", "csv")]
+        Dir = os.path.abspath(os.path.dirname(__file__))
+        file_name = fd.askopenfilename(filetypes=fTyp, initialdir=Dir)
+
+        self.entry.insert(tk.END, file_name)
 
 
 class makeButton(Application):

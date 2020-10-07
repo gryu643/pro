@@ -1,3 +1,3 @@
 @echo off
 pushd %~dp0
-python guidata.cpython-37.pyc
+python guiApp.cpython-37.pyc

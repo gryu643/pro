@@ -6,6 +6,8 @@ from PIL import Image
 from PIL import ImageTk
 from tkinter import filedialog as fd
 import os
+import csv
+import sqlite3
 
 
 class Application(tk.Frame):
@@ -183,7 +185,7 @@ class Application(tk.Frame):
         self.entry_search = ttk.Entry(
             self.frame_search,
             textvariable=self.t,
-            width=30
+            width=40
         )
         self.entry_search.grid(row=1, column=1, pady=5, sticky=tk.W)
 
@@ -207,10 +209,12 @@ class Application(tk.Frame):
 
     def makePageImport(self, frame_parent):
         # csvファイル1ウィジェット群作成
-        self.widgets_csv1 = makeCSVWidget(parent=frame_parent)
+        self.widgets_csv = makeCSVWidget(
+            parent=frame_parent, dbname='./materialDB.db')
 
         # csvファイル2ウィジェット群作成
-        self.widgets_csv2 = makeCSVWidget(parent=frame_parent)
+        self.widgets_csv2 = makeCSVWidget(
+            parent=frame_parent, dbname='./material2DB.db')
 
     def makeFrameUnder(self, frame_parent):
         # ウィンドウ下部バーフレームの作成
@@ -364,7 +368,7 @@ class makeTitle(Application):
 
 
 class makeCSVWidget(Application):
-    def __init__(self, parent):
+    def __init__(self, parent, dbname):
         # csvファイル1 フレーム作成
         self.frame = ttk.Frame(
             parent,
@@ -407,16 +411,75 @@ class makeCSVWidget(Application):
         # csvファイル1 importボタン作成
         self.button_import = ttk.Button(
             self.frame,
-            text='Import'
+            text='Import',
+            command=lambda: self.importCSV(dbname)
         )
         self.button_import.grid(row=2, column=0, sticky=tk.W)
 
     def showDialog(self):
-        fTyp = [("", "csv")]
+        fTyp = [("csvファイル", "csv")]
         Dir = os.path.abspath(os.path.dirname(__file__))
         file_name = fd.askopenfilename(filetypes=fTyp, initialdir=Dir)
 
         self.entry.insert(tk.END, file_name)
+
+    def create_table(self, conn, cur):
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS DBM(
+            機械処理年月日 TEXT,
+            西暦年度 TEXT,
+            物品コード TEXT,
+            購入識別 TEXT,
+            カナ品名 TEXT,
+            単位 TEXT,
+            要求区分 TEXT,
+            ストック区分 TEXT,
+            仕様書番号 TEXT,
+            在庫品単価 TEXT,
+            再用品単価 TEXT,
+            在庫品ダム付単価 TEXT,
+            再用品ダム付単価 TEXT,
+            ダミー1 TEXT,
+            ダミー2 TEXT,
+            主指定表示 TEXT,
+            ガードタイム TEXT,
+            直送数量倉庫 TEXT,
+            直送数量支店等 TEXT,
+            備考 TEXT
+            );""")
+
+    def importCSV(self, dbname):
+        # DBを作成して，DBに接続する
+        conn = sqlite3.connect(dbname)
+
+        # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
+        cur = conn.cursor()
+
+        # テーブル
+        self.create_table(conn, cur)
+
+        path = str(self.entry.get())
+
+        if path == "":
+            return
+
+        # csvを開く
+        with open(path, 'r', encoding="utf-8") as f:
+            # csvファイルを読み込む
+            b = csv.reader(f, delimiter=',')
+
+            # 最初の列名行を飛ばす
+            header = next(b)
+            for t in b:
+                # tableに各行のデータを挿入する
+                cur.execute(
+                    '''INSERT INTO DBM VALUES (
+                        ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);''',
+                    t)
+
+        # レコードの表示
+        for row in cur.execute("SELECT * FROM DBM"):
+            print(row)
 
 
 class makeButton(Application):

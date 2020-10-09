@@ -202,6 +202,8 @@ class Application(tk.Frame):
         # ルートウィンドウ要素の作成
         root = tk.Tk()
 
+        root.geometry('600x400')
+
         # クラス呼び出し
         Table(master=root)
 
@@ -265,6 +267,7 @@ class Application(tk.Frame):
 class Table(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
+
         # ウィンドウタイトルの設定
         master.title(u'検索結果')
 
@@ -280,59 +283,104 @@ class Table(ttk.Frame):
             self.frame_table
         )
 
-        # 列の定義
-        self.tree['columns'] = (1, 2, 3, 4)
-        self.tree['show'] = 'headings'
-        self.tree.column(1, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(2, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(3, width=190, minwidth=190, stretch=tk.NO)
-        self.tree.column(4, width=190, minwidth=190, stretch=tk.NO)
+        # 列名IDの設定
+        lst_id = list(range(1, 24))
+        tpl_id = tuple(lst_id)
+        self.tree['columns'] = tpl_id
 
-        # 見出しの定義
-        self.tree.heading(1, text='index', anchor=tk.W)
-        self.tree.heading(2, text='name', anchor=tk.W)
-        self.tree.heading(3, text='num', anchor=tk.W)
-        self.tree.heading(4, text='value', anchor=tk.W)
+        # アイコン列を表示しない
+        self.tree['show'] = 'headings'
+
+        # 列のプロパティを設定
+        for id in tpl_id:
+            self.tree.column(id, width=150, minwidth=150, stretch=tk.YES)
+
+        # 列名の定義
+        lst_column_name = [
+            '機械処理年月日',
+            '西暦年度',
+            '物品コード',
+            '購入識別',
+            'カナ品名',
+            '単位',
+            '要求区分',
+            'ストック区分',
+            '仕様書番号',
+            '在庫品単価',
+            '再用品単価',
+            '在庫品ダム付単価',
+            '再用品ダム付単価',
+            'ダミー1',
+            'ダミー2',
+            '主指定表示',
+            'ガードタイム',
+            '直送数量倉庫',
+            '直送数量支店等',
+            '備考',
+            'etc1',
+            'etc2',
+            'etc3'
+        ]
+
+        # 列名の設定
+        for id in tpl_id:
+            self.tree.heading(id, text=lst_column_name[id-1], anchor=tk.W)
 
         # insert
-        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
-        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
-        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
-        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
-        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
-        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
-        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
-        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
-        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
-        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
-        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
-        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
-        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
-        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
-        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
-        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
-        self.tree.insert('', "end", values=('1', 'apple', '2', '100'))
-        self.tree.insert('', "end", values=('2', 'orange', '5', '120'))
-        self.tree.insert('', "end", values=('3', 'grape', '1', '300'))
-        self.tree.insert('', "end", values=('4', 'pineapple', '0', '200'))
+        self.insertToTree(tree=self.tree, dbname='./materialDB.db')
 
-        self.tree.grid(row=0, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
+        self.tree.place(
+            relheight=0.95,
+            relwidth=0.95,
+            relx=0.0,
+            rely=0.0
+        )
 
         # スクロールバーの作成
         # 横方向
         self.bar_x = ttk.Scrollbar(self.frame_table, orient=tk.HORIZONTAL)
-        self.bar_x.grid(row=1, column=0, sticky=tk.W+tk.E)
+        self.bar_x.place(
+            relheight=0.05,
+            relwidth=0.95,
+            relx=0.0,
+            rely=0.95
+        )
         self.bar_x.config(command=self.tree.xview)
 
         # 縦方向
         self.bar_y = ttk.Scrollbar(self.frame_table, orient=tk.VERTICAL)
-        self.bar_y.grid(row=0, column=1, sticky=tk.N+tk.S)
+        self.bar_y.place(
+            relheight=0.95,
+            relwidth=0.05,
+            relx=0.95,
+            rely=0.0
+        )
         self.bar_y.config(command=self.tree.yview)
 
+        # ウィジェットとスクロールバーの紐づけ
         self.tree.config(
-            yscrollcommand=self.bar_y.set,
-            xscrollcommand=self.bar_x.set
+            yscrollcommand=lambda f, l: self.bar_y.set(f, l),
+            xscrollcommand=lambda f, l: self.bar_x.set(f, l)
         )
+
+    def insertToTree(self, tree, dbname):
+        # DBへ接続
+        conn = sqlite3.connect(dbname)
+
+        # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
+        cur = conn.cursor()
+
+        # レコードの表示
+        for row in cur.execute("SELECT * FROM DBM"):
+            # 包括表記によるシングルクォーテーションの削除
+            lst = [s.replace("'", "") for s in row]
+            # 包括表記によるスペースの削除
+            lst2 = [s.replace(" ", "") for s in lst]
+
+            tree.insert('', "end", values=lst2)
+
+        # close
+        conn.close()
 
 
 class makeTitle(Application):
@@ -446,9 +494,9 @@ class makeCSVWidget(Application):
             直送数量倉庫 TEXT,
             直送数量支店等 TEXT,
             備考 TEXT,
-            etc1,
-            etc2,
-            etc3
+            etc1 TEXT,
+            etc2 TEXT,
+            etc3 TEXT
             );""")
 
     def importCSV(self, dbname):
@@ -458,7 +506,7 @@ class makeCSVWidget(Application):
         # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
         cur = conn.cursor()
 
-        # テーブル
+        # ーブル
         self.create_table(conn, cur)
 
         path = str(self.entry.get())
@@ -467,13 +515,13 @@ class makeCSVWidget(Application):
             return
 
         # csvを開く
-        with open(path, 'r', encoding="cp932") as f:
+        with open(path, 'r', encoding="utf-8") as f:
             # csvファイルを読み込む
             b = csv.reader(f, delimiter=',')
 
             # 最初の列名行を飛ばす
             header = next(b)
-            
+
             # tableに各行のデータを挿入する
             cur.executemany(
                 '''INSERT INTO DBM VALUES (
@@ -481,8 +529,8 @@ class makeCSVWidget(Application):
                 b)
 
         # レコードの表示
-        #for row in cur.execute("SELECT * FROM DBM"):
-            #print(row)
+        # for row in cur.execute("SELECT * FROM DBM"):
+        #    print(row)
 
         # コミット
         conn.commit()

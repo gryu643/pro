@@ -445,7 +445,10 @@ class makeCSVWidget(Application):
             ガードタイム TEXT,
             直送数量倉庫 TEXT,
             直送数量支店等 TEXT,
-            備考 TEXT
+            備考 TEXT,
+            etc1,
+            etc2,
+            etc3
             );""")
 
     def importCSV(self, dbname):
@@ -464,7 +467,7 @@ class makeCSVWidget(Application):
             return
 
         # csvを開く
-        with open(path, 'r', encoding="utf-8") as f:
+        with open(path, 'r', encoding="cp932") as f:
             # csvファイルを読み込む
             b = csv.reader(f, delimiter=',')
 
@@ -474,12 +477,13 @@ class makeCSVWidget(Application):
                 # tableに各行のデータを挿入する
                 cur.execute(
                     '''INSERT INTO DBM VALUES (
-                        ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);''',
+                        ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);''',
                     t)
 
         # レコードの表示
         for row in cur.execute("SELECT * FROM DBM"):
-            print(row)
+            pass
+            #print(row)
 
 
 class makeButton(Application):

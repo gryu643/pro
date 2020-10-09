@@ -8,6 +8,7 @@ from tkinter import filedialog as fd
 import os
 import csv
 import sqlite3
+import pandas as pd
 
 
 class Application(tk.Frame):
@@ -284,7 +285,7 @@ class Table(ttk.Frame):
         )
 
         # 列名IDの設定
-        lst_id = list(range(1, 24))
+        lst_id = list(range(1, 18))
         tpl_id = tuple(lst_id)
         self.tree['columns'] = tpl_id
 
@@ -297,8 +298,7 @@ class Table(ttk.Frame):
 
         # 列名の定義
         lst_column_name = [
-            '機械処理年月日',
-            '西暦年度',
+            'id',
             '物品コード',
             '購入識別',
             'カナ品名',
@@ -310,21 +310,18 @@ class Table(ttk.Frame):
             '再用品単価',
             '在庫品ダム付単価',
             '再用品ダム付単価',
-            'ダミー1',
-            'ダミー2',
             '主指定表示',
             'ガードタイム',
             '直送数量倉庫',
             '直送数量支店等',
             '備考',
-            'etc1',
-            'etc2',
-            'etc3'
         ]
 
         # 列名の設定
         for id in tpl_id:
             self.tree.heading(id, text=lst_column_name[id-1], anchor=tk.W)
+
+        self.tree.configure(displaycolumns=list(range(2, 18)))
 
         # insert
         self.insertToTree(tree=self.tree, dbname='./materialDB.db')
@@ -370,14 +367,13 @@ class Table(ttk.Frame):
         # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
         cur = conn.cursor()
 
-        # レコードの表示
+        # レコードを表へ挿入
         for row in cur.execute("SELECT * FROM DBM"):
-            # 包括表記によるシングルクォーテーションの削除
-            lst = [s.replace("'", "") for s in row]
-            # 包括表記によるスペースの削除
-            lst2 = [s.replace(" ", "") for s in lst]
+            # 'を削除
+            lst = [s.replace("'", "") if type(s) == str else s for s in row]
 
-            tree.insert('', "end", values=lst2)
+            # 表へ挿入
+            tree.insert('', "end", values=lst)
 
         # close
         conn.close()
@@ -472,10 +468,13 @@ class makeCSVWidget(Application):
         self.entry.insert(tk.END, file_name)
 
     def create_table(self, conn, cur):
+        # テーブルの削除
+        cur.execute('DROP TABLE DBM')
+
+        # テーブルの作成
         cur.execute("""
         CREATE TABLE IF NOT EXISTS DBM(
-            機械処理年月日 TEXT,
-            西暦年度 TEXT,
+            id INTEGER,
             物品コード TEXT,
             購入識別 TEXT,
             カナ品名 TEXT,
@@ -487,16 +486,11 @@ class makeCSVWidget(Application):
             再用品単価 TEXT,
             在庫品ダム付単価 TEXT,
             再用品ダム付単価 TEXT,
-            ダミー1 TEXT,
-            ダミー2 TEXT,
             主指定表示 TEXT,
             ガードタイム TEXT,
             直送数量倉庫 TEXT,
             直送数量支店等 TEXT,
-            備考 TEXT,
-            etc1 TEXT,
-            etc2 TEXT,
-            etc3 TEXT
+            備考 TEXT
             );""")
 
     def importCSV(self, dbname):
@@ -506,7 +500,7 @@ class makeCSVWidget(Application):
         # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
         cur = conn.cursor()
 
-        # ーブル
+        # テーブル作成
         self.create_table(conn, cur)
 
         path = str(self.entry.get())
@@ -515,28 +509,31 @@ class makeCSVWidget(Application):
             return
 
         # csvを開く
-        with open(path, 'r', encoding="utf-8") as f:
-            # csvファイルを読み込む
-            b = csv.reader(f, delimiter=',')
+        df = pd.read_csv(path, encoding='utf-8')
 
-            # 最初の列名行を飛ばす
-            header = next(b)
+        # データ整形
+        df = self.arrangeDB(df)
 
-            # tableに各行のデータを挿入する
-            cur.executemany(
-                '''INSERT INTO DBM VALUES (
-                    ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);''',
-                b)
-
-        # レコードの表示
-        # for row in cur.execute("SELECT * FROM DBM"):
-        #    print(row)
+        # tableに各行のデータを挿入する
+        df.to_sql('DBM', conn, if_exists='replace')
 
         # コミット
         conn.commit()
 
         # 閉じる
         conn.close()
+
+    def arrangeDB(self, df):
+        # 使わないカラムを削除(INSERT文が遅いので)
+        df = df.drop('機械処理年月日', axis=1)
+        df = df.drop('西暦年度', axis=1)
+        df = df.drop('ダミー1', axis=1)
+        df = df.drop('ダミー2', axis=1)
+        df = df.drop('Unnamed: 20', axis=1)
+        df = df.drop('Unnamed: 21', axis=1)
+        df = df.drop('Unnamed: 22', axis=1)
+
+        return df
 
 
 class makeButton(Application):

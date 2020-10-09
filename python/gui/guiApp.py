@@ -473,17 +473,22 @@ class makeCSVWidget(Application):
 
             # 最初の列名行を飛ばす
             header = next(b)
-            for t in b:
-                # tableに各行のデータを挿入する
-                cur.execute(
-                    '''INSERT INTO DBM VALUES (
-                        ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);''',
-                    t)
+            
+            # tableに各行のデータを挿入する
+            cur.executemany(
+                '''INSERT INTO DBM VALUES (
+                    ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);''',
+                b)
 
         # レコードの表示
-        for row in cur.execute("SELECT * FROM DBM"):
-            pass
+        #for row in cur.execute("SELECT * FROM DBM"):
             #print(row)
+
+        # コミット
+        conn.commit()
+
+        # 閉じる
+        conn.close()
 
 
 class makeButton(Application):

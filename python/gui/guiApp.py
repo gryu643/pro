@@ -6,7 +6,7 @@ from PIL import Image
 from PIL import ImageTk
 from tkinter import filedialog as fd
 import os
-import csv
+import time
 import sqlite3
 import pandas as pd
 

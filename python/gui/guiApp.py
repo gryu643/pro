@@ -182,7 +182,7 @@ class Application(tk.Frame):
         self.label5.grid(row=1, column=0, pady=5, sticky=tk.W)
 
         # 検索ワードエントリーの作成
-        self.t = tk.StringVar
+        self.t = tk.StringVar()
         self.entry_search = ttk.Entry(
             self.frame_search,
             textvariable=self.t,
@@ -206,7 +206,7 @@ class Application(tk.Frame):
         root.geometry('600x400')
 
         # クラス呼び出し
-        Table(master=root)
+        Table(master=root, keyword=self.t.get(), column=self.combovalue.get())
 
         root.mainloop()
 
@@ -266,8 +266,10 @@ class Application(tk.Frame):
 
 
 class Table(ttk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, keyword, column):
         ttk.Frame.__init__(self, master)
+
+        self.master = master
 
         # ウィンドウタイトルの設定
         master.title(u'検索結果')
@@ -324,7 +326,12 @@ class Table(ttk.Frame):
         self.tree.configure(displaycolumns=list(range(2, 18)))
 
         # insert
-        self.insertToTree(tree=self.tree, dbname='./materialDB.db')
+        self.insertToTree(
+            tree=self.tree,
+            dbname='./materialDB.db',
+            keyword=keyword,
+            column=column
+        )
 
         self.tree.place(
             relheight=0.95,
@@ -360,23 +367,34 @@ class Table(ttk.Frame):
             xscrollcommand=lambda f, l: self.bar_x.set(f, l)
         )
 
-    def insertToTree(self, tree, dbname):
-        # DBへ接続
-        conn = sqlite3.connect(dbname)
+        self.frame_table.tkraise()
 
-        # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
-        cur = conn.cursor()
+    def insertToTree(self, tree, dbname, keyword, column):
+        try:
+            # DBへ接続
+            conn = sqlite3.connect(dbname)
 
-        # レコードを表へ挿入
-        for row in cur.execute("SELECT * FROM DBM"):
-            # 'を削除
-            lst = [s.replace("'", "") if type(s) == str else s for s in row]
+            # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
+            cur = conn.cursor()
 
-            # 表へ挿入
-            tree.insert('', "end", values=lst)
+            # query文の作成
+            query = 'SELECT * FROM DBM WHERE ' + column + '=?;'
 
-        # close
-        conn.close()
+            # 検索文字列に'をつけてタプル化
+            tpl_keyword = ("'" + str(keyword) + "'", )
+
+            # レコードを表へ挿入
+            for row in cur.execute(query, tpl_keyword):
+                # 'を削除
+                lst = [s.replace("'", "") if type(
+                    s) == str else s for s in row]
+
+                # 表へ挿入
+                tree.insert('', "end", values=lst)
+
+        finally:
+            # close
+            conn.close()
 
 
 class makeTitle(Application):
@@ -469,7 +487,7 @@ class makeCSVWidget(Application):
 
     def create_table(self, conn, cur):
         # テーブルの削除
-        cur.execute('DROP TABLE DBM')
+        cur.execute('DROP TABLE IF EXISTS DBM')
 
         # テーブルの作成
         cur.execute("""

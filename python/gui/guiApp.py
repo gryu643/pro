@@ -30,7 +30,7 @@ class Application(tk.Frame):
         self.s.theme_use('clam')
         self.s.configure(
             'MyWidget.TButton',
-            background='cadet blue',
+            background='DarkGoldenrod3',
             borderwidth=0,
             shiftrelief=0,
             relief='flat',
@@ -53,7 +53,7 @@ class Application(tk.Frame):
             'Button.TButton',
             width=8,
             height=3,
-            background='cadet blue',
+            background='DarkGoldenrod3',
             relief='groove'
         )
 
@@ -63,7 +63,7 @@ class Application(tk.Frame):
             'MyWidget.TCombobox',
             width=8,
             height=3,
-            background='cadet blue',
+            background='DarkGoldenrod3',
             relief='groove'
         )
 
@@ -142,9 +142,33 @@ class Application(tk.Frame):
         self.makePageImport(self.frame_import)
         # --------------------------------------------------
 
+        # -----設定フレーム----------------------------------
+        # 設定ページフレーム作成
+        self.frame_setting = ttk.Frame(
+            master,
+            padding=18,
+            style='Page.TButton'
+        )
+        self.frame_setting.grid(row=0, column=0, sticky=tk.N+tk.W+tk.S+tk.E)
+
+        # ページタイトル作成
+        self.title_setting = makeTitle(
+            parent=self.frame_setting,
+            file_path='./image/setting.png',
+            title='アプリ設定'
+        )
+
+        # ウィジェット作成
+        self.makePageSetting(self.frame_setting)
+        # --------------------------------------------------
+
         # -----画面遷移ボタンの作成-------------------------
         # 画面下部バーの設定
         self.makeFrameUnder(master)
+        # -------------------------------------------------
+
+        # -----フッターの作成-------------------------------
+        self.makeFooter(master)
         # -------------------------------------------------
 
         # frame_materialを一番上に表示
@@ -217,6 +241,33 @@ class Application(tk.Frame):
         )
         self.button1.grid(row=1, column=2, pady=5, padx=2)
 
+    def makePageSetting(self, parent):
+        # テーマ1ウィジェット群作成
+        self.widgets_setting1 = makeSettingWidget(
+            parent=parent,
+            text='テーマ1'
+        )
+
+        # テーマ2ウィジェット群作成
+        self.widgets_setting2 = makeSettingWidget(
+            parent=parent,
+            text='テーマ2'
+        )
+
+    def makeFooter(self, master):
+        # ページフレーム作成
+        self.frame_status = ttk.Frame(
+            master
+        )
+        self.frame_status.grid(row=2, column=0, sticky=tk.W + tk.E)
+
+        self.label_status = ttk.Label(
+            self.frame_status,
+            text='guiApp(ver.1.0) <latest update @2020.10>',
+            font=('游明朝', '8')
+        )
+        self.label_status.pack(side=tk.RIGHT, fill=tk.X)
+
     def makePageTable(self):
         # ルートウィンドウ要素の作成
         root = tk.Tk()
@@ -279,6 +330,15 @@ class Application(tk.Frame):
             parent=self.frame_bar,
             image_path='./image/file.png',
             label_name='csvインポート',
+            order=3
+        )
+
+        # 設定フレーム
+        self.button_setting = makeButton(
+            move_page=self.frame_setting,
+            parent=self.frame_bar,
+            image_path='./image/setting.png',
+            label_name='アプリ設定',
             order=3
         )
 
@@ -442,7 +502,7 @@ class makeTitle(Application):
             image=self.img,
             style='Page.TButton'
         )
-        self.label_icon.pack(side=tk.LEFT)
+        self.label_icon.pack(side=tk.LEFT, anchor=tk.W)
 
         # タイトルラベル作成
         self.label_title = ttk.Label(
@@ -591,6 +651,74 @@ class makeCSVWidget(Application):
         return df
 
 
+class makeSettingWidget():
+    def __init__(self, parent, text):
+        s = ttk.Style()
+        s.configure(
+            'Setting.TButton',
+            background='SlateGray4',
+            borderwidth=1,
+            font=('游明朝', '12')
+        )
+
+        # フレーム作成
+        self.frame = ttk.Frame(
+            parent,
+            style='Setting.TButton',
+            padding=5
+        )
+        self.frame.pack(side=tk.TOP, anchor=tk.CENTER)
+
+        # フレームキャンバス
+        self.frame_canvas = ttk.Frame(
+            self.frame,
+            style='Page.TButton',
+            padding=5
+        )
+        self.frame_canvas.pack(side=tk.LEFT)
+
+        # キャンバス作成
+        self.canvas = tk.Canvas(
+            self.frame_canvas,
+            width=20,
+            height=20,
+            bg='SlateGray4'
+        )
+        self.canvas.pack(side=tk.LEFT)
+
+        # フレームラベル&パレット
+        self.frame_palette = ttk.Frame(
+            self.frame,
+            style='Page.TButton',
+            padding=5
+        )
+        self.frame_palette.pack(side=tk.LEFT)
+
+        # ラベル作成
+        self.label = ttk.Label(
+            self.frame_palette,
+            text=text,
+            style='Page.TButton',
+            font=('游明朝', '12')
+        )
+        self.label.grid(row=0, column=0)
+
+        # カラーパレットボタン作成
+        self.button_palette = ttk.Button(
+            self.frame_palette,
+            text=u'パレット',
+            command=lambda: self.showColorPalette,
+            style='Button.TButton',
+        )
+        self.button_palette.grid(
+            row=1,
+            column=0
+        )
+
+    def showColorPalette(self):
+        pass
+
+
 class makeButton(Application):
     def __init__(self, move_page, parent, image_path, label_name, order):
         # イメージの作成
@@ -602,7 +730,7 @@ class makeButton(Application):
             parent,
             style='MyWidget.TButton'
         )
-        self.frame_button.pack(side=tk.LEFT, padx=30)
+        self.frame_button.pack(side=tk.LEFT, padx=20)
 
         # 遷移ボタン作成
         self.button_change = ttk.Button(

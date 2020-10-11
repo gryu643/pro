@@ -2,11 +2,11 @@
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 from PIL import Image
 from PIL import ImageTk
 from tkinter import filedialog as fd
 import os
-import time
 import sqlite3
 import pandas as pd
 
@@ -490,7 +490,11 @@ class makeCSVWidget(Application):
         Dir = os.path.abspath(os.path.dirname(__file__))
         file_name = fd.askopenfilename(filetypes=fTyp, initialdir=Dir)
 
-        self.entry.insert(tk.END, file_name)
+        if file_name == "":
+            return
+        else:
+            self.entry.delete(0, tk.END)
+            self.entry.insert(tk.END, file_name)
 
     def create_table(self, conn, cur):
         # テーブルの削除
@@ -547,6 +551,12 @@ class makeCSVWidget(Application):
 
         # 閉じる
         conn.close()
+
+        # 終了メッセージ
+        messagebox.showinfo(
+            title='Information',
+            message='データベースへのインポートが完了しました．'
+        )
 
     def arrangeDB(self, df):
         # 使わないカラムを削除(INSERT文が遅いので)

@@ -30,10 +30,11 @@ class Application(tk.Frame):
         self.s.theme_use('clam')
         self.s.configure(
             'MyWidget.TButton',
-            background='PaleTurquoise3',
+            background='cadet blue',
             borderwidth=0,
             shiftrelief=0,
-            relief='flat'
+            relief='flat',
+            font=('游明朝', '12')
         )
 
         # ページのスタイル作成
@@ -46,12 +47,24 @@ class Application(tk.Frame):
             relief='flat'
         )
 
-        # ページのスタイル作成
+        # ボタンのスタイル作成
         self.sss = ttk.Style()
         self.sss.configure(
             'Button.TButton',
             width=8,
-            height=3
+            height=3,
+            background='cadet blue',
+            relief='groove'
+        )
+
+        # コンボボックスのスタイル作成
+        self.s4 = ttk.Style()
+        self.s4.configure(
+            'MyWidget.TCombobox',
+            width=8,
+            height=3,
+            background='cadet blue',
+            relief='groove'
         )
 
         # -----物品検索フレーム-----------------------------
@@ -152,7 +165,7 @@ class Application(tk.Frame):
             self.frame_search,
             text='検索対象',
             style='Page.TButton',
-            font=('Helvetica', '10')
+            font=('游明朝', '12')
         )
         self.label1.grid(row=0, column=0, sticky=tk.W, pady=5)
 
@@ -165,8 +178,12 @@ class Application(tk.Frame):
 
         # コンボボックス作成
         self.combo1 = ttk.Combobox(
-            self.frame_search, state='readonly', value=self.types,
-            textvariable=self.combovalue
+            self.frame_search,
+            state='readonly',
+            value=self.types,
+            font=('游明朝', '12'),
+            textvariable=self.combovalue,
+            style='MyWidget.TCombobox'
         )
         # 初期選択値設定
         self.combo1.current(0)
@@ -177,7 +194,7 @@ class Application(tk.Frame):
             self.frame_search,
             text='検索ワード',
             style='Page.TButton',
-            font=('Helvetica', '10')
+            font=('游明朝', '12')
         )
         self.label5.grid(row=1, column=0, pady=5, sticky=tk.W)
 
@@ -186,7 +203,8 @@ class Application(tk.Frame):
         self.entry_search = ttk.Entry(
             self.frame_search,
             textvariable=self.t,
-            width=40
+            width=40,
+            font=('游明朝', '12')
         )
         self.entry_search.grid(row=1, column=1, pady=5, sticky=tk.W)
 
@@ -431,7 +449,7 @@ class makeTitle(Application):
             self.frame_title,
             text=title,
             style='Page.TButton',
-            font=('Helvetica', '18')
+            font=('游明朝', '18')
         )
         self.label_title.pack(anchor=tk.W, side=tk.LEFT)
 
@@ -450,7 +468,7 @@ class makeCSVWidget(Application):
             self.frame,
             text='csvファイル1',
             style='Page.TButton',
-            font=('Helvetica', '10')
+            font=('游明朝', '12')
         )
         self.label.grid(row=0, column=0, sticky=tk.W)
 
@@ -459,7 +477,8 @@ class makeCSVWidget(Application):
         self.entry = ttk.Entry(
             self.frame,
             textvariable=t,
-            width=50
+            width=50,
+            font=('游明朝', '12')
         )
         self.entry.grid(row=1, column=0, sticky=tk.W)
 
@@ -468,7 +487,7 @@ class makeCSVWidget(Application):
             self.frame,
             text=u'参 照',
             command=lambda: self.showDialog(),
-            style='Button.TButton'
+            style='Button.TButton',
         )
         self.button_reference.grid(
             row=1,
@@ -481,6 +500,7 @@ class makeCSVWidget(Application):
         self.button_import = ttk.Button(
             self.frame,
             text='Import',
+            style='Button.TButton',
             command=lambda: self.importCSV(dbname)
         )
         self.button_import.grid(row=2, column=0, sticky=tk.W)

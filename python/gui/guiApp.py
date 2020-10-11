@@ -378,7 +378,14 @@ class Table(ttk.Frame):
             cur = conn.cursor()
 
             # query文の作成
-            query = 'SELECT * FROM DBM WHERE ' + column + '=?;'
+            # ワイルドカードが入っている場合,LIKE句を使う
+            if '*' in keyword:
+                query = 'SELECT * FROM DBM WHERE ' + column + ' like ?;'
+            else:
+                query = 'SELECT * FROM DBM WHERE ' + column + '=?;'
+
+            # ワイルドカードをLike句に置換
+            keyword = keyword.replace('*', '%')
 
             # 検索文字列に'をつけてタプル化
             tpl_keyword = ("'" + str(keyword) + "'", )

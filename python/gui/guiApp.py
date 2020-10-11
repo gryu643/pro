@@ -477,7 +477,7 @@ class makeCSVWidget(Application):
         self.entry = ttk.Entry(
             self.frame,
             textvariable=t,
-            width=50,
+            width=40,
             font=('游明朝', '12')
         )
         self.entry.grid(row=1, column=0, sticky=tk.W)
@@ -602,7 +602,7 @@ class makeButton(Application):
             parent,
             style='MyWidget.TButton'
         )
-        self.frame_button.pack(side=tk.LEFT, padx=60)
+        self.frame_button.pack(side=tk.LEFT, padx=30)
 
         # 遷移ボタン作成
         self.button_change = ttk.Button(

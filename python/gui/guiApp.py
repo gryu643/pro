@@ -270,15 +270,22 @@ class Application(tk.Frame):
         self.label_status.pack(side=tk.RIGHT, fill=tk.X)
 
     def makePageTable(self):
-        # ルートウィンドウ要素の作成
-        root = tk.Tk()
+        sec1 = time.time()
+        for i in range(0, 5):
+            # ルートウィンドウ要素の作成
+            root = tk.Tk()
 
-        root.geometry('600x400')
+            root.geometry('600x400')
 
-        # クラス呼び出し
-        Table(master=root, keyword=self.t.get(), column=self.combovalue.get())
+            # クラス呼び出し
+            Table(master=root, keyword=self.t.get(),
+                  column=self.combovalue.get())
 
-        root.mainloop()
+            # root.mainloop()
+
+        sec2 = time.time()
+
+        print((sec2-sec1)/5)
 
     def makePageImport(self, frame_parent):
         # csvファイル1ウィジェット群作成
@@ -459,34 +466,30 @@ class Table(ttk.Frame):
             # query文の作成
             # ワイルドカードが入っている場合,LIKE句を使う
             if '*' in keyword:
-                query = 'SELECT * FROM DBM WHERE ' + column + ' LIKE ? ORDER BY カナ品名;'
+                query = 'SELECT * FROM DBM WHERE ' + column + \
+                    ' COLLATE NOCASE LIKE ? ORDER BY カナ品名;'
             else:
-                query = 'SELECT * FROM DBM WHERE ' + column + '=? ORDER BY カナ品名;'
+                query = 'SELECT * FROM DBM WHERE ' + column + \
+                    '=? ORDER BY カナ品名;'
 
             # ワイルドカードをLike句に置換
             keyword = keyword.replace('*', '%')
 
             # 検索文字列に'をつけてタプル化
             tpl_keyword = ("'" + str(keyword) + "'", )
-            
-            # レコードを表へ挿入
-            sec1 = time.time()
-            lst = [[s.replace("'", "") if type(
-                    s) == str else s for s in row] for row in cur.execute(query, tpl_keyword)] 
 
-            sec2 = time.time()
+            # レコードを表へ挿入
+            lst = [[s.replace("'", "") if type(
+                    s) == str else s for s in row] for row in cur.execute(query, tpl_keyword)]
 
             # 表へ挿入
             for l in lst:
                 tree.insert('', "end", values=l)
 
-            sec3 = time.time()
+            # commit
+            conn.commit()
 
-            print('1to2: ' + str(sec2-sec1))
-            print('2to3: ' + str(sec3-sec2))
-            print('3to1: ' + str(sec3-sec1))
-
-        except:
+        except Exception:
             conn.rollback()
 
         finally:
@@ -631,7 +634,7 @@ class makeCSVWidget(Application):
                 return
 
             # csvを開く
-            df = pd.read_csv(path, encoding='cp932')
+            df = pd.read_csv(path, encoding='utf-8')
 
             # データ整形
             df = self.arrangeDB(df)
@@ -641,13 +644,13 @@ class makeCSVWidget(Application):
 
             # インデックス作成(物品コード)
             cur.execute('''
-                CREATE INDEX IF NOT EXISTS codeindex on DBM(物品コード, カナ品名);
+                CREATE INDEX IF NOT EXISTS codeindex on DBM(物品コード, カナ品名 COLLATE NOCASE);
             ''')
 
             # コミット
             conn.commit()
 
-        except:
+        except Exception:
             conn.rollback()
 
         finally:

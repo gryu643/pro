@@ -9,6 +9,7 @@ from tkinter import filedialog as fd
 import os
 import sqlite3
 import pandas as pd
+import time
 
 
 class Application(tk.Frame):
@@ -365,7 +366,7 @@ class Table(ttk.Frame):
         )
 
         # 列名IDの設定
-        lst_id = list(range(1, 18))
+        lst_id = list(range(0, 17))
         tpl_id = tuple(lst_id)
         self.tree['columns'] = tpl_id
 
@@ -399,9 +400,9 @@ class Table(ttk.Frame):
 
         # 列名の設定
         for id in tpl_id:
-            self.tree.heading(id, text=lst_column_name[id-1], anchor=tk.W)
+            self.tree.heading(id, text=lst_column_name[id], anchor=tk.W)
 
-        self.tree.configure(displaycolumns=list(range(2, 18)))
+        self.tree.configure(displaycolumns=list(range(1, 17)))
 
         # insert
         self.insertToTree(
@@ -450,7 +451,7 @@ class Table(ttk.Frame):
     def insertToTree(self, tree, dbname, keyword, column):
         try:
             # DBへ接続
-            conn = sqlite3.connect(dbname)
+            conn = sqlite3.connect(dbname, isolation_level=None)
 
             # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
             cur = conn.cursor()
@@ -458,24 +459,32 @@ class Table(ttk.Frame):
             # query文の作成
             # ワイルドカードが入っている場合,LIKE句を使う
             if '*' in keyword:
-                query = 'SELECT * FROM DBM WHERE ' + column + ' like ?;'
+                query = 'SELECT * FROM DBM WHERE ' + column + ' LIKE ? ORDER BY カナ品名;'
             else:
-                query = 'SELECT * FROM DBM WHERE ' + column + '=?;'
+                query = 'SELECT * FROM DBM WHERE ' + column + '=? ORDER BY カナ品名;'
 
             # ワイルドカードをLike句に置換
             keyword = keyword.replace('*', '%')
 
             # 検索文字列に'をつけてタプル化
             tpl_keyword = ("'" + str(keyword) + "'", )
-
+            
             # レコードを表へ挿入
-            for row in cur.execute(query, tpl_keyword):
-                # 'を削除
-                lst = [s.replace("'", "") if type(
-                    s) == str else s for s in row]
+            sec1 = time.time()
+            lst = [[s.replace("'", "") if type(
+                    s) == str else s for s in row] for row in cur.execute(query, tpl_keyword)] 
 
-                # 表へ挿入
-                tree.insert('', "end", values=lst)
+            sec2 = time.time()
+
+            # 表へ挿入
+            for l in lst:
+                tree.insert('', "end", values=l)
+
+            sec3 = time.time()
+
+            print('1to2: ' + str(sec2-sec1))
+            print('2to3: ' + str(sec3-sec2))
+            print('3to1: ' + str(sec3-sec1))
 
         finally:
             # close
@@ -618,13 +627,18 @@ class makeCSVWidget(Application):
             return
 
         # csvを開く
-        df = pd.read_csv(path, encoding='utf-8')
+        df = pd.read_csv(path, encoding='cp932')
 
         # データ整形
         df = self.arrangeDB(df)
 
         # tableに各行のデータを挿入する
         df.to_sql('DBM', conn, if_exists='replace')
+
+        # インデックス作成(物品コード)
+        cur.execute('''
+            CREATE INDEX IF NOT EXISTS codeindex on DBM(物品コード, カナ品名);
+        ''')
 
         # コミット
         conn.commit()

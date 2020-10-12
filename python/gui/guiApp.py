@@ -375,7 +375,7 @@ class Table(ttk.Frame):
 
         # 列のプロパティを設定
         for id in tpl_id:
-            self.tree.column(id, width=150, minwidth=150, stretch=tk.YES)
+            self.tree.column(id, width=150, minwidth=50, stretch=tk.YES)
 
         # 列名の定義
         lst_column_name = [
@@ -451,7 +451,7 @@ class Table(ttk.Frame):
     def insertToTree(self, tree, dbname, keyword, column):
         try:
             # DBへ接続
-            conn = sqlite3.connect(dbname, isolation_level=None)
+            conn = sqlite3.connect(dbname, isolation_level='EXCLUSIVE')
 
             # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
             cur = conn.cursor()
@@ -485,6 +485,9 @@ class Table(ttk.Frame):
             print('1to2: ' + str(sec2-sec1))
             print('2to3: ' + str(sec3-sec2))
             print('3to1: ' + str(sec3-sec1))
+
+        except:
+            conn.rollback()
 
         finally:
             # close
@@ -612,45 +615,50 @@ class makeCSVWidget(Application):
             );""")
 
     def importCSV(self, dbname):
-        # DBを作成して，DBに接続する
-        conn = sqlite3.connect(dbname)
+        try:
+            # DBを作成して，DBに接続する
+            conn = sqlite3.connect(dbname, isolation_level='EXCLUSIVE')
 
-        # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
-        cur = conn.cursor()
+            # DB上の処理対象の行を指し示すためのcursorオブジェクト作成
+            cur = conn.cursor()
 
-        # テーブル作成
-        self.create_table(conn, cur)
+            # テーブル作成
+            self.create_table(conn, cur)
 
-        path = str(self.entry.get())
+            path = str(self.entry.get())
 
-        if path == "":
-            return
+            if path == "":
+                return
 
-        # csvを開く
-        df = pd.read_csv(path, encoding='cp932')
+            # csvを開く
+            df = pd.read_csv(path, encoding='cp932')
 
-        # データ整形
-        df = self.arrangeDB(df)
+            # データ整形
+            df = self.arrangeDB(df)
 
-        # tableに各行のデータを挿入する
-        df.to_sql('DBM', conn, if_exists='replace')
+            # tableに各行のデータを挿入する
+            df.to_sql('DBM', conn, if_exists='replace')
 
-        # インデックス作成(物品コード)
-        cur.execute('''
-            CREATE INDEX IF NOT EXISTS codeindex on DBM(物品コード, カナ品名);
-        ''')
+            # インデックス作成(物品コード)
+            cur.execute('''
+                CREATE INDEX IF NOT EXISTS codeindex on DBM(物品コード, カナ品名);
+            ''')
 
-        # コミット
-        conn.commit()
+            # コミット
+            conn.commit()
 
-        # 閉じる
-        conn.close()
+        except:
+            conn.rollback()
 
-        # 終了メッセージ
-        messagebox.showinfo(
-            title='Information',
-            message='データベースへのインポートが完了しました．'
-        )
+        finally:
+            # 閉じる
+            conn.close()
+
+            # 終了メッセージ
+            messagebox.showinfo(
+                title='Information',
+                message='データベースへのインポートが完了しました．'
+            )
 
     def arrangeDB(self, df):
         # 使わないカラムを削除(INSERT文が遅いので)

@@ -270,22 +270,16 @@ class Application(tk.Frame):
         self.label_status.pack(side=tk.RIGHT, fill=tk.X)
 
     def makePageTable(self):
-        sec1 = time.time()
-        for i in range(0, 5):
-            # ルートウィンドウ要素の作成
-            root = tk.Tk()
+        # ルートウィンドウ要素の作成
+        root = tk.Tk()
 
-            root.geometry('600x400')
+        root.geometry('600x400')
 
-            # クラス呼び出し
-            Table(master=root, keyword=self.t.get(),
-                  column=self.combovalue.get())
+        # クラス呼び出し
+        Table(master=root, keyword=self.t.get(),
+              column=self.combovalue.get())
 
-            # root.mainloop()
-
-        sec2 = time.time()
-
-        print((sec2-sec1)/5)
+        root.mainloop()
 
     def makePageImport(self, frame_parent):
         # csvファイル1ウィジェット群作成
@@ -464,13 +458,23 @@ class Table(ttk.Frame):
             cur = conn.cursor()
 
             # query文の作成
+            # collate_nocase
+            collate_nocase = 'COLLATE NOCASE'
+
+            # 並び順
+            order = 'ORDER BY カナ品名 '
+
+            # 制限
+            lim = 'LIMIT 30'
+
             # ワイルドカードが入っている場合,LIKE句を使う
             if '*' in keyword:
-                query = 'SELECT * FROM DBM WHERE ' + column + \
-                    ' COLLATE NOCASE LIKE ? ORDER BY カナ品名;'
+                op = 'LIKE ? '
             else:
-                query = 'SELECT * FROM DBM WHERE ' + column + \
-                    '=? ORDER BY カナ品名;'
+                op = '= ? '
+
+            query = 'SELECT * FROM DBM WHERE ' + column + ' ' + \
+                collate_nocase + ' ' + op + order + lim
 
             # ワイルドカードをLike句に置換
             keyword = keyword.replace('*', '%')

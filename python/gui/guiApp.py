@@ -467,14 +467,14 @@ class Table(ttk.Frame):
             # 制限
             lim = 'LIMIT 30'
 
+            # offset(番目まで飛ばす)
+            offset = 5
+
             # ワイルドカードが入っている場合,LIKE句を使う
             if '*' in keyword:
                 op = 'LIKE ? '
             else:
                 op = '= ? '
-
-            query = 'SELECT * FROM DBM WHERE ' + column + ' ' + \
-                collate_nocase + ' ' + op + order + lim
 
             # ワイルドカードをLike句に置換
             keyword = keyword.replace('*', '%')
@@ -482,13 +482,17 @@ class Table(ttk.Frame):
             # 検索文字列に'をつけてタプル化
             tpl_keyword = ("'" + str(keyword) + "'", )
 
+            query = 'SELECT * FROM DBM WHERE ' + column + ' ' + \
+                collate_nocase + ' ' + op + order + lim + \
+                ' OFFSET ' + str(offset) + ';'
+
             # レコードを表へ挿入
             lst = [[s.replace("'", "") if type(
                     s) == str else s for s in row] for row in cur.execute(query, tpl_keyword)]
 
             # 表へ挿入
-            for l in lst:
-                tree.insert('', "end", values=l)
+            for r in lst:
+                tree.insert('', "end", values=r)
 
             # commit
             conn.commit()

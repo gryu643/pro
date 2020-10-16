@@ -354,7 +354,7 @@ class Application(tk.Frame):
 
 
 class Table(ttk.Frame):
-    def __init__(self, master, keyword, column, offset):
+    def __init__(self, master, keyword, column, offset, frmprev=None):
         ttk.Frame.__init__(self, master)
 
         self.master = master
@@ -412,7 +412,12 @@ class Table(ttk.Frame):
             master,
             style='MyWidget.TFrame'
         )
-        self.frame_table.pack(expand=True, fill=tk.BOTH, side=tk.TOP)
+        self.frame_table.place(
+            relheight=1.0,
+            relwidth=1.0,
+            relx=0.0,
+            rely=0.0
+        )
 
         # 表の作成
         self.tree = ttk.Treeview(
@@ -539,11 +544,14 @@ class Table(ttk.Frame):
                 self.frame_prev,
                 style='Move.TButton',
                 image=self.imgprev,
-                command=lambda: None,
+                command=lambda: frmprev.tkraise()
             )
             self.button_prev.pack()
 
         if self.flgEnd is False:
+            # offsetの更新
+            offset = offset + 30
+
             # 次へボタンフレーム作成
             self.frame_next = ttk.Frame(
                 self.frame_mv
@@ -560,7 +568,7 @@ class Table(ttk.Frame):
                 self.frame_next,
                 style='Move.TButton',
                 image=self.imgnext,
-                command=lambda: None,
+                command=lambda: Table(master=master, keyword=keyword, column=column, offset=offset, frmprev=self.frame_table)
             )
             self.button_next.pack()
 

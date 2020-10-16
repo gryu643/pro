@@ -9,12 +9,13 @@ from tkinter import filedialog as fd
 import os
 import sqlite3
 import pandas as pd
-import time
 
 
 class Application(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
+
+        self.root = master
 
         # ウィンドウタイトルの設定
         master.title(u'物品検索')
@@ -271,13 +272,20 @@ class Application(tk.Frame):
 
     def makePageTable(self):
         # ルートウィンドウ要素の作成
-        root = tk.Tk()
+        root = tk.Toplevel(self.root)
 
         root.geometry('600x400')
 
+        # offset初期化
+        offset = 0
+
         # クラス呼び出し
-        Table(master=root, keyword=self.t.get(),
-              column=self.combovalue.get())
+        Table(
+            master=root,
+            keyword=self.t.get(),
+            column=self.combovalue.get(),
+            offset=offset
+        )
 
         root.mainloop()
 
@@ -346,10 +354,55 @@ class Application(tk.Frame):
 
 
 class Table(ttk.Frame):
-    def __init__(self, master, keyword, column):
+    def __init__(self, master, keyword, column, offset):
         ttk.Frame.__init__(self, master)
 
         self.master = master
+
+        # Treeウィジェットのスタイル作成
+        self.s1 = ttk.Style()
+        self.s1.configure(
+            'MyWidget.Treeview',
+            background='SlateGray4',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='White',
+            font=('游明朝', '12')
+        )
+
+        # Treeウィジェットのスタイル作成
+        self.s2 = ttk.Style()
+        self.s2.configure(
+            'MyWidget.Horizontal.TScrollbar',
+            background='White',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='flat',
+            font=('游明朝', '10')
+        )
+
+        self.s3 = ttk.Style()
+        self.s3.configure(
+            'MyWidget.Vertical.TScrollbar',
+            background='White',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='flat',
+            font=('游明朝', '10')
+        )
+
+        self.s4 = ttk.Style()
+        self.s4.configure(
+            'MyWidget.TFrame',
+            background='White'
+        )
+
+        self.s5 = ttk.Style()
+        self.s5.configure(
+            'Move.TButton',
+            background='White',
+            relief='flat'
+        )
 
         # ウィンドウタイトルの設定
         master.title(u'検索結果')
@@ -357,13 +410,14 @@ class Table(ttk.Frame):
         # 表フレーム作成
         self.frame_table = ttk.Frame(
             master,
-            style='Page.TButton'
+            style='MyWidget.TFrame'
         )
-        self.frame_table.pack(expand=True, fill=tk.BOTH)
+        self.frame_table.pack(expand=True, fill=tk.BOTH, side=tk.TOP)
 
         # 表の作成
         self.tree = ttk.Treeview(
-            self.frame_table
+            self.frame_table,
+            style='Mywidget.Treeview'
         )
 
         # 列名IDの設定
@@ -406,15 +460,16 @@ class Table(ttk.Frame):
         self.tree.configure(displaycolumns=list(range(1, 17)))
 
         # insert
-        self.insertToTree(
+        self.flgEnd = self.insertToTree(
             tree=self.tree,
             dbname='./materialDB.db',
             keyword=keyword,
-            column=column
+            column=column,
+            offset=offset
         )
 
         self.tree.place(
-            relheight=0.95,
+            relheight=0.9,
             relwidth=0.95,
             relx=0.0,
             rely=0.0
@@ -422,19 +477,27 @@ class Table(ttk.Frame):
 
         # スクロールバーの作成
         # 横方向
-        self.bar_x = ttk.Scrollbar(self.frame_table, orient=tk.HORIZONTAL)
+        self.bar_x = ttk.Scrollbar(
+            self.frame_table,
+            orient=tk.HORIZONTAL,
+            style='MyWidget.Horizontal.TScrollbar'
+        )
         self.bar_x.place(
             relheight=0.05,
             relwidth=0.95,
             relx=0.0,
-            rely=0.95
+            rely=0.85
         )
         self.bar_x.config(command=self.tree.xview)
 
         # 縦方向
-        self.bar_y = ttk.Scrollbar(self.frame_table, orient=tk.VERTICAL)
+        self.bar_y = ttk.Scrollbar(
+            self.frame_table,
+            orient=tk.VERTICAL,
+            style='MyWidget.Vertical.TScrollbar'
+        )
         self.bar_y.place(
-            relheight=0.95,
+            relheight=0.85,
             relwidth=0.05,
             relx=0.95,
             rely=0.0
@@ -447,9 +510,63 @@ class Table(ttk.Frame):
             xscrollcommand=lambda f, l: self.bar_x.set(f, l)
         )
 
+        # 遷移ボタンフレームの作成
+        self.frame_mv = ttk.Frame(
+            self.frame_table,
+            style='MyWidget.TFrame'
+        )
+        self.frame_mv.place(
+            relheight=0.1,
+            relwidth=1.0,
+            relx=0.0,
+            rely=0.9
+        )
+
+        if offset != 0:
+            # 前へボタンフレーム作成
+            self.frame_prev = ttk.Frame(
+                self.frame_mv
+            )
+            self.frame_prev.pack(side=tk.LEFT, anchor=tk.W)
+
+            # イメージの作成
+            self.imageprev = Image.open('./image/arrow_prev.png')
+            self.imageprev = self.imageprev.resize((30, 30))
+            self.imgprev = ImageTk.PhotoImage(self.imageprev)
+
+            # 前へボタン作成
+            self.button_prev = ttk.Button(
+                self.frame_prev,
+                style='Move.TButton',
+                image=self.imgprev,
+                command=lambda: None,
+            )
+            self.button_prev.pack()
+
+        if self.flgEnd is False:
+            # 次へボタンフレーム作成
+            self.frame_next = ttk.Frame(
+                self.frame_mv
+            )
+            self.frame_next.pack(side=tk.RIGHT, anchor=tk.E)
+
+            # イメージの作成
+            self.imagenext = Image.open('./image/arrow_next.png')
+            self.imagenext = self.imagenext.resize((30, 30))
+            self.imgnext = ImageTk.PhotoImage(self.imagenext)
+
+            # 次へボタン作成
+            self.button_next = ttk.Button(
+                self.frame_next,
+                style='Move.TButton',
+                image=self.imgnext,
+                command=lambda: None,
+            )
+            self.button_next.pack()
+
         self.frame_table.tkraise()
 
-    def insertToTree(self, tree, dbname, keyword, column):
+    def insertToTree(self, tree, dbname, keyword, column, offset):
         try:
             # DBへ接続
             conn = sqlite3.connect(dbname, isolation_level='EXCLUSIVE')
@@ -466,9 +583,6 @@ class Table(ttk.Frame):
 
             # 制限
             lim = 'LIMIT 30'
-
-            # offset(番目まで飛ばす)
-            offset = 5
 
             # ワイルドカードが入っている場合,LIKE句を使う
             if '*' in keyword:
@@ -490,6 +604,12 @@ class Table(ttk.Frame):
             lst = [[s.replace("'", "") if type(
                     s) == str else s for s in row] for row in cur.execute(query, tpl_keyword)]
 
+            # 終了判定
+            if len(lst) < 30:
+                flgEnd = True
+            else:
+                flgEnd = False
+
             # 表へ挿入
             for r in lst:
                 tree.insert('', "end", values=r)
@@ -503,6 +623,8 @@ class Table(ttk.Frame):
         finally:
             # close
             conn.close()
+
+            return flgEnd
 
 
 class makeTitle(Application):

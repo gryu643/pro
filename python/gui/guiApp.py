@@ -568,7 +568,8 @@ class Table(ttk.Frame):
                 self.frame_next,
                 style='Move.TButton',
                 image=self.imgnext,
-                command=lambda: Table(master=master, keyword=keyword, column=column, offset=offset, frmprev=self.frame_table)
+                command=lambda: Table(master=master, keyword=keyword,
+                                      column=column, offset=offset, frmprev=self.frame_table)
             )
             self.button_next.pack()
 
@@ -587,7 +588,7 @@ class Table(ttk.Frame):
             collate_nocase = 'COLLATE NOCASE'
 
             # 並び順
-            order = 'ORDER BY カナ品名 '
+            order = 'ORDER BY id '
 
             # 制限
             lim = 'LIMIT 30'
@@ -626,10 +627,16 @@ class Table(ttk.Frame):
             conn.commit()
 
         except Exception:
+            # エラーメッセージ
+            messagebox.showerror(
+                title='Error',
+                message='データベース検索中にエラーが発生しました．'
+            )
+
             conn.rollback()
 
         finally:
-            # close
+            # 閉じる
             conn.close()
 
             return flgEnd
@@ -752,7 +759,8 @@ class makeCSVWidget(Application):
             ガードタイム TEXT,
             直送数量倉庫 TEXT,
             直送数量支店等 TEXT,
-            備考 TEXT
+            備考 TEXT,
+            PRIMARY KEY(id, 物品コード, カナ品名)
             );""")
 
     def importCSV(self, dbname):
@@ -772,34 +780,35 @@ class makeCSVWidget(Application):
                 return
 
             # csvを開く
-            df = pd.read_csv(path, encoding='utf-8')
+            df = pd.read_csv(path, encoding='utf-8', index_col=None)
 
             # データ整形
             df = self.arrangeDB(df)
 
             # tableに各行のデータを挿入する
-            df.to_sql('DBM', conn, if_exists='replace')
-
-            # インデックス作成(物品コード)
-            cur.execute('''
-                CREATE INDEX IF NOT EXISTS codeindex on DBM(物品コード, カナ品名 COLLATE NOCASE);
-            ''')
+            df.to_sql('DBM', conn, if_exists='replace', index=False)
 
             # コミット
             conn.commit()
-
-        except Exception:
-            conn.rollback()
-
-        finally:
-            # 閉じる
-            conn.close()
 
             # 終了メッセージ
             messagebox.showinfo(
                 title='Information',
                 message='データベースへのインポートが完了しました．'
             )
+
+        except Exception:
+            # エラーメッセージ
+            messagebox.showerror(
+                title='Error',
+                message='インポート中にエラーが発生しました．'
+            )
+
+            conn.rollback()
+
+        finally:
+            # 閉じる
+            conn.close()
 
     def arrangeDB(self, df):
         # 使わないカラムを削除(INSERT文が遅いので)
@@ -810,6 +819,9 @@ class makeCSVWidget(Application):
         df = df.drop('Unnamed: 20', axis=1)
         df = df.drop('Unnamed: 21', axis=1)
         df = df.drop('Unnamed: 22', axis=1)
+
+        # id行の挿入
+        df.insert(0, 'id', list(range(0, len(df))))
 
         return df
 

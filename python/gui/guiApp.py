@@ -276,15 +276,11 @@ class Application(tk.Frame):
 
         root.geometry('600x400')
 
-        # offset初期化
-        offset = 0
-
         # クラス呼び出し
         Table(
             master=root,
             keyword=self.t.get(),
-            column=self.combovalue.get(),
-            offset=offset
+            column=self.combovalue.get()
         )
 
         root.mainloop()
@@ -354,7 +350,7 @@ class Application(tk.Frame):
 
 
 class Table(ttk.Frame):
-    def __init__(self, master, keyword, column, offset, frmprev=None):
+    def __init__(self, master, keyword, column, frmprev=None, lastid=0):
         ttk.Frame.__init__(self, master)
 
         self.master = master
@@ -465,12 +461,12 @@ class Table(ttk.Frame):
         self.tree.configure(displaycolumns=list(range(1, 17)))
 
         # insert
-        self.flgEnd = self.insertToTree(
+        rst = self.insertToTree(
             tree=self.tree,
             dbname='./materialDB.db',
             keyword=keyword,
             column=column,
-            offset=offset
+            lastid=lastid
         )
 
         self.tree.place(
@@ -527,7 +523,7 @@ class Table(ttk.Frame):
             rely=0.9
         )
 
-        if offset != 0:
+        if lastid != 0:
             # 前へボタンフレーム作成
             self.frame_prev = ttk.Frame(
                 self.frame_mv
@@ -548,10 +544,7 @@ class Table(ttk.Frame):
             )
             self.button_prev.pack()
 
-        if self.flgEnd is False:
-            # offsetの更新
-            offset = offset + 30
-
+        if rst[0] is False:
             # 次へボタンフレーム作成
             self.frame_next = ttk.Frame(
                 self.frame_mv
@@ -568,14 +561,17 @@ class Table(ttk.Frame):
                 self.frame_next,
                 style='Move.TButton',
                 image=self.imgnext,
-                command=lambda: Table(master=master, keyword=keyword,
-                                      column=column, offset=offset, frmprev=self.frame_table)
+                command=lambda: Table(master=master,
+                                      keyword=keyword,
+                                      column=column,
+                                      frmprev=self.frame_table,
+                                      lastid=rst[1])
             )
             self.button_next.pack()
 
         self.frame_table.tkraise()
 
-    def insertToTree(self, tree, dbname, keyword, column, offset):
+    def insertToTree(self, tree, dbname, keyword, column, lastid):
         try:
             # DBへ接続
             conn = sqlite3.connect(dbname, isolation_level='EXCLUSIVE')
@@ -591,7 +587,8 @@ class Table(ttk.Frame):
             order = 'ORDER BY id '
 
             # 制限
-            lim = 'LIMIT 30'
+            lim_n = 30
+            lim = 'LIMIT ' + str(lim_n)
 
             # ワイルドカードが入っている場合,LIKE句を使う
             if '*' in keyword:
@@ -603,21 +600,23 @@ class Table(ttk.Frame):
             keyword = keyword.replace('*', '%')
 
             # 検索文字列に'をつけてタプル化
-            tpl_keyword = ("'" + str(keyword) + "'", )
+            tpl_keyword = (lastid, "'" + str(keyword) + "'")
 
-            query = 'SELECT * FROM DBM WHERE ' + column + ' ' + \
-                collate_nocase + ' ' + op + order + lim + \
-                ' OFFSET ' + str(offset) + ';'
+            query = 'SELECT * FROM DBM WHERE ' + 'id >= ? AND ' + column + ' ' + \
+                collate_nocase + ' ' + op + order + lim + ';'
 
             # レコードを表へ挿入
             lst = [[s.replace("'", "") if type(
                     s) == str else s for s in row] for row in cur.execute(query, tpl_keyword)]
 
             # 終了判定
-            if len(lst) < 30:
+            if len(lst) < lim_n:
                 flgEnd = True
             else:
                 flgEnd = False
+
+            # 取得した最後のレコードのidを取得
+            next_id = lst[-1][0] + 1
 
             # 表へ挿入
             for r in lst:
@@ -639,7 +638,7 @@ class Table(ttk.Frame):
             # 閉じる
             conn.close()
 
-            return flgEnd
+            return flgEnd, next_id
 
 
 class makeTitle(Application):

@@ -860,6 +860,19 @@ class makeCSVWidget(Application):
 
 class makeSettingWidget():
     def __init__(self, master, parent, text):
+        # 設定ファイルに色情報格納
+        config = cp.ConfigParser()
+
+        # configファイル読み込み
+        config.read('./config.ini')
+
+        if text == ': Theme 1':
+            theme = 1
+            canvas_color = config['COLOR']['Theme1']
+        elif text == ': Theme 2':
+            theme = 2
+            canvas_color = config['COLOR']['Theme2']
+
         # masterウィンドウの格納
         self.root = master
 
@@ -883,7 +896,8 @@ class makeSettingWidget():
         self.canvas = tk.Canvas(
             self.frame_canvas,
             width=30,
-            height=30
+            height=30,
+            bg=canvas_color
         )
         self.canvas.pack(side=tk.LEFT)
 
@@ -903,11 +917,6 @@ class makeSettingWidget():
             font=('游明朝', '12')
         )
         self.label.grid(row=0, column=0)
-
-        if text == ': Theme 1':
-            theme = 1
-        elif text == ': Theme 2':
-            theme = 2
 
         # カラーパレットボタン作成
         self.button_palette = ttk.Button(

@@ -9,6 +9,7 @@ from tkinter import filedialog as fd
 import os
 import sqlite3
 import pandas as pd
+import configparser as cp
 
 
 class Application(tk.Frame):
@@ -27,12 +28,16 @@ class Application(tk.Frame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # configファイルの読み取り
+        config = cp.ConfigParser()
+        config.read('./config.ini')
+
         # 下部バーのスタイル作成
         self.s = ttk.Style()
         self.s.theme_use('clam')
         self.s.configure(
             'MyWidget.TButton',
-            background='DarkGoldenrod3',
+            background=config['COLOR']['Theme2'],
             borderwidth=0,
             shiftrelief=0,
             relief='flat',
@@ -43,7 +48,7 @@ class Application(tk.Frame):
         self.ss = ttk.Style()
         self.ss.configure(
             'Page.TButton',
-            background='SlateGray4',
+            background=config['COLOR']['Theme1'],
             borderwidth=0,
             shiftrelief=0,
             relief='flat'
@@ -55,7 +60,7 @@ class Application(tk.Frame):
             'Button.TButton',
             width=8,
             height=3,
-            background='DarkGoldenrod3',
+            background=config['COLOR']['Theme2'],
             relief='groove'
         )
 
@@ -65,8 +70,72 @@ class Application(tk.Frame):
             'MyWidget.TCombobox',
             width=8,
             height=3,
-            background='DarkGoldenrod3',
+            background=config['COLOR']['Theme2'],
             relief='groove'
+        )
+
+        # Treeウィジェットのスタイル作成
+        self.s5 = ttk.Style()
+        self.s5.configure(
+            'MyWidget.Treeview',
+            background=config['COLOR']['Theme1'],
+            borderwidth=0,
+            shiftrelief=0,
+            relief='White',
+            font=('游明朝', '12')
+        )
+
+        # Treeウィジェットのスタイル作成
+        self.s6 = ttk.Style()
+        self.s6.configure(
+            'MyWidget.Horizontal.TScrollbar',
+            background='White',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='flat',
+            font=('游明朝', '10')
+        )
+
+        self.s7 = ttk.Style()
+        self.s7.configure(
+            'MyWidget.Vertical.TScrollbar',
+            background='White',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='flat',
+            font=('游明朝', '10')
+        )
+
+        self.s8 = ttk.Style()
+        self.s8.configure(
+            'MyWidget.TFrame',
+            background='White'
+        )
+
+        self.s9 = ttk.Style()
+        self.s9.configure(
+            'Move.TButton',
+            background='White',
+            relief='flat'
+        )
+
+        self.s10 = ttk.Style()
+        self.s10.configure(
+            'Setting.TFrame',
+            background=config['COLOR']['Theme1'],
+            borderwidth=1,
+            font=('游明朝', '12')
+        )
+
+        # スタイルの設定
+        self.s11 = ttk.Style()
+        self.s11.configure(
+            style='Palette.TFrame',
+            background='Black',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='flat',
+            font=('游明朝', '12')
         )
 
         # -----物品検索フレーム-----------------------------
@@ -356,51 +425,6 @@ class Table(ttk.Frame):
         ttk.Frame.__init__(self, master)
 
         self.master = master
-
-        # Treeウィジェットのスタイル作成
-        self.s1 = ttk.Style()
-        self.s1.configure(
-            'MyWidget.Treeview',
-            background='SlateGray4',
-            borderwidth=0,
-            shiftrelief=0,
-            relief='White',
-            font=('游明朝', '12')
-        )
-
-        # Treeウィジェットのスタイル作成
-        self.s2 = ttk.Style()
-        self.s2.configure(
-            'MyWidget.Horizontal.TScrollbar',
-            background='White',
-            borderwidth=0,
-            shiftrelief=0,
-            relief='flat',
-            font=('游明朝', '10')
-        )
-
-        self.s3 = ttk.Style()
-        self.s3.configure(
-            'MyWidget.Vertical.TScrollbar',
-            background='White',
-            borderwidth=0,
-            shiftrelief=0,
-            relief='flat',
-            font=('游明朝', '10')
-        )
-
-        self.s4 = ttk.Style()
-        self.s4.configure(
-            'MyWidget.TFrame',
-            background='White'
-        )
-
-        self.s5 = ttk.Style()
-        self.s5.configure(
-            'Move.TButton',
-            background='White',
-            relief='flat'
-        )
 
         # ウィンドウタイトルの設定
         master.title(u'検索結果')
@@ -839,14 +863,6 @@ class makeSettingWidget():
         # masterウィンドウの格納
         self.root = master
 
-        s = ttk.Style()
-        s.configure(
-            'Setting.TFrame',
-            background='SlateGray4',
-            borderwidth=1,
-            font=('游明朝', '12')
-        )
-
         # フレーム作成
         self.frame = ttk.Frame(
             parent,
@@ -867,8 +883,7 @@ class makeSettingWidget():
         self.canvas = tk.Canvas(
             self.frame_canvas,
             width=30,
-            height=30,
-            bg='SlateGray4'
+            height=30
         )
         self.canvas.pack(side=tk.LEFT)
 
@@ -889,11 +904,16 @@ class makeSettingWidget():
         )
         self.label.grid(row=0, column=0)
 
+        if text == ': Theme 1':
+            theme = 1
+        elif text == ': Theme 2':
+            theme = 2
+
         # カラーパレットボタン作成
         self.button_palette = ttk.Button(
             self.frame_palette,
             text=u'パレット',
-            command=lambda: self.showColorPalette(self.canvas),
+            command=lambda: self.showColorPalette(self.canvas, theme),
             style='Button.TButton',
         )
         self.button_palette.grid(
@@ -901,7 +921,7 @@ class makeSettingWidget():
             column=1
         )
 
-    def showColorPalette(self, c):
+    def showColorPalette(self, c, theme):
         # ルートウィンドウ要素の作成
         root = tk.Toplevel(self.root)
 
@@ -911,23 +931,12 @@ class makeSettingWidget():
         root.resizable(width=False, height=False)
 
         # パレットの表示
-        self.Palette(master=root, c=c)
+        self.Palette(master=root, c=c, theme=theme)
 
         # mainloop
         root.mainloop()
 
-    def Palette(self, master, c):
-        # スタイルの設定
-        self.s = ttk.Style()
-        self.s.configure(
-            style='Palette.TFrame',
-            background='Black',
-            borderwidth=0,
-            shiftrelief=0,
-            relief='flat',
-            font=('游明朝', '12')
-        )
-
+    def Palette(self, master, c, theme):
         # color配列の作成
         arrColor = [
             ['DarkGoldenrod3', 'tan1', 'chocolate1', 'yellow2',
@@ -965,17 +974,18 @@ class makeSettingWidget():
                     row=row,
                     column=col,
                     color=arrColor[row][col],
-                    c=c
+                    c=c,
+                    theme=theme
                 )
 
 
 class makeCanvas():
-    def __init__(self, parent, row, column, color, c):
+    def __init__(self, parent, row, column, color, c, theme):
         self.canvas = tk.Button(
             parent,
             bg=color,
             relief='flat',
-            command=lambda: self.click(c, color)
+            command=lambda: self.click(c, color, theme)
         )
         self.canvas.place(
             relheight=0.125,
@@ -984,8 +994,31 @@ class makeCanvas():
             relx=column / 8
         )
 
-    def click(self, c, color):
+    def click(self, c, color, theme):
+        # 色をパレットに適用
         c.configure(bg=color)
+
+        # 設定ファイルに色情報格納
+        config = cp.ConfigParser()
+
+        # configファイル読み込み
+        config.read('./config.ini')
+
+        # 現在の設定値を取得
+        color1 = config['COLOR']['Theme1']
+        color2 = config['COLOR']['Theme2']
+
+        if theme == 1:
+            color1 = color
+        elif theme == 2:
+            color2 = color
+
+        config['COLOR'] = {
+            'Theme1': color1,
+            'Theme2': color2
+        }
+        with open('./config.ini', 'w') as file:
+            config.write(file)
 
 
 class makeButton(Application):

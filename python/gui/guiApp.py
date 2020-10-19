@@ -246,14 +246,16 @@ class Application(tk.Frame):
     def makePageSetting(self, parent):
         # テーマ1ウィジェット群作成
         self.widgets_setting1 = makeSettingWidget(
+            master=self.root,
             parent=parent,
-            text='テーマ1'
+            text=': Theme 1'
         )
 
         # テーマ2ウィジェット群作成
         self.widgets_setting2 = makeSettingWidget(
+            master=self.root,
             parent=parent,
-            text='テーマ2'
+            text=': Theme 2'
         )
 
     def makeFooter(self, master):
@@ -265,7 +267,7 @@ class Application(tk.Frame):
 
         self.label_status = ttk.Label(
             self.frame_status,
-            text='guiApp(ver.1.0) <latest update @2020.10>',
+            text='guiApp(ver.1.0) -- latest update 2020.10 --',
             font=('游明朝', '8')
         )
         self.label_status.pack(side=tk.RIGHT, fill=tk.X)
@@ -606,11 +608,11 @@ class Table(ttk.Frame):
 
             query = 'SELECT * FROM DBM WHERE ' + 'id >= ? AND ' + column + ' ' + \
                 collate_nocase + ' ' + op + order + ' ' + lim + ';'
-            
+
             # レコードを表へ挿入
             lst = [[s.replace("'", "") if type(
                     s) == str else s for s in row] for row in cur.execute(query, tpl_keyword)]
-    
+
             # 終了判定
             if len(lst) < lim_n or lim == '':
                 flgEnd = True
@@ -786,7 +788,7 @@ class makeCSVWidget(Application):
                 return
 
             # csvを開く
-            df = pd.read_csv(path, encoding='cp932', index_col=None)
+            df = pd.read_csv(path, encoding='utf-8', index_col=None)
 
             # データ整形
             df = self.arrangeDB(df)
@@ -833,10 +835,13 @@ class makeCSVWidget(Application):
 
 
 class makeSettingWidget():
-    def __init__(self, parent, text):
+    def __init__(self, master, parent, text):
+        # masterウィンドウの格納
+        self.root = master
+
         s = ttk.Style()
         s.configure(
-            'Setting.TButton',
+            'Setting.TFrame',
             background='SlateGray4',
             borderwidth=1,
             font=('游明朝', '12')
@@ -845,10 +850,10 @@ class makeSettingWidget():
         # フレーム作成
         self.frame = ttk.Frame(
             parent,
-            style='Setting.TButton',
-            padding=5
+            style='Setting.TFrame',
+            padding=15
         )
-        self.frame.pack(side=tk.TOP, anchor=tk.CENTER)
+        self.frame.pack(side=tk.TOP, anchor=tk.CENTER, fill=tk.Y)
 
         # フレームキャンバス
         self.frame_canvas = ttk.Frame(
@@ -861,8 +866,8 @@ class makeSettingWidget():
         # キャンバス作成
         self.canvas = tk.Canvas(
             self.frame_canvas,
-            width=20,
-            height=20,
+            width=30,
+            height=30,
             bg='SlateGray4'
         )
         self.canvas.pack(side=tk.LEFT)
@@ -888,16 +893,99 @@ class makeSettingWidget():
         self.button_palette = ttk.Button(
             self.frame_palette,
             text=u'パレット',
-            command=lambda: self.showColorPalette,
+            command=lambda: self.showColorPalette(self.canvas),
             style='Button.TButton',
         )
         self.button_palette.grid(
-            row=1,
-            column=0
+            row=0,
+            column=1
         )
 
-    def showColorPalette(self):
-        pass
+    def showColorPalette(self, c):
+        # ルートウィンドウ要素の作成
+        root = tk.Toplevel(self.root)
+
+        root.geometry('400x400')
+
+        # サイズ固定
+        root.resizable(width=False, height=False)
+
+        # パレットの表示
+        self.Palette(master=root, c=c)
+
+        # mainloop
+        root.mainloop()
+
+    def Palette(self, master, c):
+        # スタイルの設定
+        self.s = ttk.Style()
+        self.s.configure(
+            style='Palette.TFrame',
+            background='Black',
+            borderwidth=0,
+            shiftrelief=0,
+            relief='flat',
+            font=('游明朝', '12')
+        )
+
+        # color配列の作成
+        arrColor = [
+            ['DarkGoldenrod3', 'tan1', 'chocolate1', 'yellow2',
+             'RosyBrown1', 'salmon1', 'brown4', 'khaki1'],
+            ['IndianRed2', 'OrangeRed3', 'magenta2', 'red4',
+             'VioletRed3', 'purple', 'orchid1', 'MediumOrchid4'],
+            ['SkyBlue3', 'DeepSkyBlue3', 'SteelBlue2', 'DodgerBlue2',
+             'blue2', 'RoyalBlue2', 'SlateBlue4', 'SlateBlue2'],
+            ['cyan', 'dark turquoise', 'medium aquamarine', 'darkgreen',
+             'dark sea green', 'lawn green', 'lime green', 'dark khaki'],
+            ['azure', 'SlateGray4', 'lavender', 'floral white',
+             'Black', 'White', 'gray64', 'thistle1']
+        ]
+
+        # 選択された色を格納する変数
+        self.color = None
+
+        # パレットフレーム作成
+        self.frame_palette = ttk.Frame(
+            master,
+            style='Palette.TFrame'
+        )
+        self.frame_palette.place(
+            relheight=1.0,
+            relwidth=1.0,
+            relx=0.0,
+            rely=0.0
+        )
+
+        # キャンバスの作成
+        for row in range(5):
+            for col in range(8):
+                makeCanvas(
+                    parent=self.frame_palette,
+                    row=row,
+                    column=col,
+                    color=arrColor[row][col],
+                    c=c
+                )
+
+
+class makeCanvas():
+    def __init__(self, parent, row, column, color, c):
+        self.canvas = tk.Button(
+            parent,
+            bg=color,
+            relief='flat',
+            command=lambda: self.click(c, color)
+        )
+        self.canvas.place(
+            relheight=0.125,
+            relwidth=0.125,
+            rely=row / 8,
+            relx=column / 8
+        )
+
+    def click(self, c, color):
+        c.configure(bg=color)
 
 
 class makeButton(Application):

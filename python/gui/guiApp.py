@@ -584,11 +584,13 @@ class Table(ttk.Frame):
             collate_nocase = 'COLLATE NOCASE'
 
             # 並び順
-            order = 'ORDER BY id '
+            order = 'ORDER BY id'
 
             # 制限
             lim_n = 30
             lim = 'LIMIT ' + str(lim_n)
+            # ページネーション適用時コメントアウトすること
+            lim = ''
 
             # ワイルドカードが入っている場合,LIKE句を使う
             if '*' in keyword:
@@ -603,25 +605,27 @@ class Table(ttk.Frame):
             tpl_keyword = (lastid, "'" + str(keyword) + "'")
 
             query = 'SELECT * FROM DBM WHERE ' + 'id >= ? AND ' + column + ' ' + \
-                collate_nocase + ' ' + op + order + lim + ';'
-
+                collate_nocase + ' ' + op + order + ' ' + lim + ';'
+            
             # レコードを表へ挿入
             lst = [[s.replace("'", "") if type(
                     s) == str else s for s in row] for row in cur.execute(query, tpl_keyword)]
-
+    
             # 終了判定
-            if len(lst) < lim_n:
+            if len(lst) < lim_n or lim == '':
                 flgEnd = True
             else:
                 flgEnd = False
 
             # 取得した最後のレコードのidを取得
-            next_id = lst[-1][0] + 1
+            if len(lst) != 0:
+                next_id = lst[-1][0] + 1
+            else:
+                next_id = None
 
             # 表へ挿入
             for r in lst:
                 tree.insert('', "end", values=r)
-
             # commit
             conn.commit()
 
@@ -737,7 +741,10 @@ class makeCSVWidget(Application):
 
     def create_table(self, conn, cur):
         # テーブルの削除
-        cur.execute('DROP TABLE IF EXISTS DBM')
+        cur.execute('DROP TABLE IF EXISTS DBM;')
+
+        # 削除した領域の解放
+        cur.execute('VACUUM;')
 
         # テーブルの作成
         cur.execute("""
@@ -779,7 +786,7 @@ class makeCSVWidget(Application):
                 return
 
             # csvを開く
-            df = pd.read_csv(path, encoding='utf-8', index_col=None)
+            df = pd.read_csv(path, encoding='cp932', index_col=None)
 
             # データ整形
             df = self.arrangeDB(df)

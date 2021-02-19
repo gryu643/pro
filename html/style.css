@@ -1,0 +1,43 @@
+body{
+    background: #696969;
+    font-family: Meiryo;
+}
+
+#div1{
+    padding: 10px;
+    text-align: center;
+    border: 2px solid #000000;
+    margin: 30px auto;
+}
+
+#img_ironman{
+    text-align: center;
+}
+
+#div2{
+    text-align: center;
+    padding: 30px;
+}
+
+#btn1{
+    background: #c04949;
+    border-radius: 7px;
+    text-align: center;
+    border: 0 solid #000000;
+    width: 100px;
+    height: 40px;
+    font-weight: bold;
+}
+
+.koumoku{
+    font-weight: bold;
+    background: #c04949;
+    padding: 10px 50px;
+    border-radius: 7px;
+}
+
+.div_koumoku{
+    display: flex;
+    justify-content: space-evenly;
+    padding: 20px;
+}
